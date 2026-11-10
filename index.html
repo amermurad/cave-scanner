@@ -1061,6 +1061,25 @@ function exportCSV(){const c=isComp();if(c?!CRAW:!D){status('لا توجد نت�
  const t=c?(CRAW_RAW||CRAW).map((r,k)=>CRAD[k].toFixed(2)+','+r.map(x=>x===null?'':x).join(',')).join('\n'):D.map(r=>r.map(x=>x===null?'':x.toFixed(3)).join(',')).join('\n');
  dl('cave_results.csv','\ufeff'+t,'text/csv')}
 window.addEventListener('load',()=>{metaLoad();if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{})});
+/* ---------- جودة القراءات (فرجار) ---------- */
+function qWarn(m){let b=$('qBar');if(!b){b=document.createElement('div');b.id='qBar';b.style.cssText='position:sticky;top:0;z-index:98;background:#ff5252;color:#fff;text-align:center;padding:10px;font-weight:700;cursor:pointer';b.onclick=()=>{b.style.display='none'};document.body.insertBefore(b,document.body.firstChild)}
+ b.textContent=m;b.style.display='';clearTimeout(b._t);b._t=setTimeout(()=>{b.style.display='none'},10000);try{navigator.vibrate&&navigator.vibrate([150,80,150])}catch(e){}}
+function spikeCheck(el,nb){el.style.outline='';el.title='';const v=parseFloat(el.value);if(!Number.isFinite(v))return false;
+ const n=nb.map(e=>e?parseFloat(e.value):NaN).filter(Number.isFinite);if(n.length<2)return false;
+ const hi=Math.max(...n),lo=Math.min(...n);
+ if((hi>0&&v>hi*2.5)||(lo>0&&v<lo*0.4)){el.style.outline='3px solid #ff5252';el.title='قراءة معزولة: تحقق من تلامس القطب';return true}return false}
+let lastK=-1;
+const _pring=putRing;
+putRing=function(k,m,v){const ok=_pring(k,m,v);
+ if(ok){lastK=k;const N=CN[k],bad=[];
+  [m-1,m].forEach(q=>{if(q<0)return;const e=$('c'+k+'_'+q);if(!e)return;if(spikeCheck(e,[$('c'+k+'_'+((q-1+N)%N)),$('c'+k+'_'+((q+1)%N))]))bad.push(q+1)});
+  if(bad.length)qWarn('⚠ دائرة '+(k+1)+': قراءة معزولة عند العيّنة '+bad.join('، ')+' — تحقق من تلامس القطب وأعد القياس')}
+ return ok};
+const _rl=ringLine;
+ringLine=function(line){_rl(line);
+ if(/^RING_DONE/i.test(String(line).trim())&&lastK>=0){const N=CN[lastK],miss=[];
+  for(let q=0;q<N;q++){const e=$('c'+lastK+'_'+q);if(!e||e.value==='')miss.push(q+1)}
+  if(miss.length)qWarn('⚠ دائرة '+(lastK+1)+': عيّنات ناقصة '+miss.join('، ')+' — أعد قياسها')}};
 /* اقتران أول مرة: يحتاج لمسة من المستخدم (قيد المتصفح) */
 async function connectInput(){
  if(!navigator.bluetooth){status('Web Bluetooth غير متاح: استخدم Chrome أو Edge وصفحة HTTPS (لا يعمل على Safari/iPhone).');return}
