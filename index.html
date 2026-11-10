@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منظومة مسح الكهوف الذكية — Murad Hasan Alhasheesh</title>
+<meta name="author" content="Murad Hasan Alhasheesh">
+<meta name="theme-color" content="#101214">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#101214;--panel:#1a1d21;--line:#2c3138;--fg:#e6e8eb;--mut:#8b93a0;--acc:#3ddc97;--h:#3ddc97;--v:#ffc857;--inp:#23272d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f2f4f6;--panel:#fff;--line:#d5dae0;--fg:#1b1f24;--mut:#5b6572;--acc:#0a8f5a;--h:#0a8f5a;--v:#b36b00;--inp:#eef1f4;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f2f4f6;--panel:#fff;--line:#d5dae0;--fg:#1b1f24;--mut:#5b6572;--acc:#0a8f5a;--h:#0a8f5a;--v:#b36b00;--inp:#eef1f4;color-scheme:light}
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:-apple-system,"Segoe UI",Roboto,"Noto Naskh Arabic",sans-serif;overflow:hidden}
+header{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0 3px;line-height:1.25}
+header .ttl{font-size:14px;font-weight:800;color:var(--acc)}
+header .own{font-size:10.5px;font-weight:600;color:var(--mut);letter-spacing:.8px;direction:ltr}
+main{flex:1;min-height:0;position:relative}
+.pn{position:absolute;inset:0;display:none;flex-direction:column;gap:8px;padding:8px 10px}
+.pn.on{display:flex}
+.fl{flex:1;min-height:0;overflow:auto;position:relative}
+footer{flex:none;text-align:center;font-size:9.5px;color:var(--mut);padding:3px 8px 4px;border-top:1px solid var(--line);background:var(--panel);letter-spacing:.2px;opacity:.9}
+nav{display:flex;background:var(--panel);border-top:1px solid var(--line)}
+nav button{flex:1;border:0;border-radius:0;background:none;color:var(--mut);padding:7px 2px 8px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav button i{font-style:normal;font-size:18px}
+nav button.on{color:var(--acc);box-shadow:inset 0 2px 0 var(--acc)}
+.row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:12px}
+@media(min-width:760px){.cp,.opt,.act{max-width:620px;margin-inline:auto;width:100%}body>*{width:100%;max-width:980px;margin-inline:auto}nav{border:1px solid var(--line);border-radius:12px 12px 0 0}footer{border-radius:0}.pn{padding:10px 14px}.num{width:72px}}
+label{display:flex;align-items:center;gap:5px;color:var(--mut);font-size:12px}
+select,input,button{font:inherit}
+select{background:var(--inp);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px}
+.num{width:56px;height:34px;text-align:center;background:var(--inp);color:var(--fg);border:1px solid var(--line);border-radius:8px}
+button{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;background:var(--inp);color:var(--fg);font-size:12px}
+button.p{background:var(--acc);color:#04130c;border-color:transparent;width:100%;padding:12px;font-size:15px}
+button:active{opacity:.75}
+/* شبكة قراءة مدمجة: 10×10 ظاهرة بعرض الشاشة دون تمرير أفقي */
+#p0 .fl{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+#tin{width:100%;max-width:100%;table-layout:fixed;border-collapse:separate;border-spacing:1px;margin:0 auto}
+#tin th{font-weight:600;color:var(--mut);font-size:9px;padding:0;overflow:hidden}
+#tin th:first-child{width:27px}
+#tin td{padding:0;min-width:0}
+.hv{display:flex;gap:1px;width:100%;min-width:0;align-items:center}
+.g{display:block;flex:1 1 50%;min-width:0;width:50%;height:25px;text-align:center;font-size:9px;border-radius:5px;background:var(--inp);color:var(--fg);border:1px solid var(--line);padding:0 1px}
+.g.h{border-color:var(--h);box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--h) 30%,transparent)}.g.v{border-color:var(--v);box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--v) 30%,transparent)}
+.g::placeholder{opacity:.8;font-size:8px}.g:focus,.num:focus,.hd:focus{outline:1px solid var(--acc);outline-offset:0;z-index:1}
+.hd{width:100%;min-width:0;height:25px;text-align:center;font-size:8px;font-weight:700;border-radius:5px;background:var(--inp);border:1px solid var(--line);color:var(--fg);padding:0 1px}
+.hd.h{color:var(--h)}.hd.v{color:var(--v)}
+#tin tr:first-child th:not(:first-child){color:var(--v)}
+#tin tr:not(:first-child) th{color:var(--h)}
+.axis-corner{display:block;font-size:10px;font-weight:800;color:var(--acc);line-height:1.1}
+@media(max-width:380px){#tin th:first-child{width:23px}#tin .g{height:23px;font-size:8px}#tin .hd{height:23px;font-size:7px}#tin th{font-size:8px}}
+@media(min-width:600px){#tin{max-width:900px}#tin .g{height:30px;font-size:11px}#tin .hd{height:30px;font-size:10px}}
+.off .g{opacity:.35}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;background:transparent;color:var(--mut)}
+.seg button.on{background:var(--acc);color:#04130c}
+.rc{width:36px;height:34px;text-align:center;font-size:10px;font-weight:700;border-radius:5px}
+#cv,#ccv{display:none;max-width:100%;max-height:100%;border-radius:10px;touch-action:none;cursor:crosshair}
+#p2{--ts:.33}#p2 .seg,#p2 #tg,#p2 .row.z{zoom:var(--ts)}
+#c3{width:100%;height:100%;display:block;touch-action:none;cursor:grab;border-radius:12px;background:radial-gradient(circle at 50% 35%,var(--inp),var(--bg))}
+.bar{height:12px;border-radius:6px;flex:1;border:1px solid var(--line)}
+.lg{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--mut);direction:ltr}
+#info{min-height:18px;font-size:12px;text-align:center}
+.hint{font-size:11px;color:var(--mut);line-height:1.6;margin:0;text-align:center}
+.b-h{color:var(--h);font-weight:700}.b-v{color:var(--v);font-weight:700}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sg label{flex-direction:column;align-items:stretch;gap:4px}.sg .w2{grid-column:1/3}
+.sg input.num,.sg select{width:100%}
+h3{font-size:12px;color:var(--acc);margin:12px 0 6px}
+.chip{padding:5px 10px;font-size:11px}.chip.on{background:var(--acc);color:#04130c}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.kv{background:var(--inp);border:1px solid var(--line);border-radius:8px;padding:5px 6px;text-align:center}
+.kv span{display:block;font-size:10px;color:var(--mut)}.kv b{font-size:12px}
+.kv.k{border-color:var(--acc)}
+.w{color:var(--v);font-size:11px}
+/* ترتيب إعدادات الفرجار */
+.ch{display:flex;flex-direction:column;gap:6px}
+.cp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cp label{flex-direction:column;align-items:stretch;gap:2px;font-size:10.5px;text-align:center}.cp .num{width:100%}
+.opt{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.opt .chk{flex-direction:row;gap:5px;background:var(--inp);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:11px;color:var(--fg)}
+.opt select{padding:2px 4px;font-size:11px;border-radius:6px}
+.act{display:flex;gap:6px}.act button{flex:1}.act .pri{flex:2;background:var(--acc);color:#04130c;border-color:transparent}
+/* إدخال على دائرة */
+.cir{position:relative;margin:4px auto}.cir svg{position:absolute;inset:0;pointer-events:none}
+.cir .g{position:absolute;display:block;padding:0;flex:none;text-align:center}
+.rr{margin-bottom:8px}.rr b{display:block;font-size:11px;color:var(--acc);margin-bottom:3px}
+.rs{display:flex;gap:2px;overflow-x:auto;padding-bottom:4px}
+.rs .g{flex:0 0 38px;width:38px;height:30px;font-size:11px}.g.c{border-color:var(--acc)}
+/* إدخال الفرجار: الخانات مصطفّة شعاعياً (كل عمود = اتجاه واحد عبر كل المدارات) */
+#cin{overflow:auto;max-width:100%}.cgrid{width:100%}
+.ruler{position:relative;height:14px;margin-bottom:2px}.ruler span{position:absolute;font-size:9px;color:var(--mut)}
+#cin .rr b{position:sticky;inset-inline-start:0;width:max-content}
+.rs2{display:flex;gap:2px}.cc{flex:1 1 0;min-width:0;display:flex;flex-direction:column}
+.cc .g{width:100%;flex:none;height:30px;font-size:11px}
+.nt{font-size:8px;height:10px;line-height:10px;text-align:center;color:var(--mut);overflow:hidden;white-space:nowrap}
+.rs .rc.c2{flex:0 0 40px;width:40px;height:30px;line-height:30px;display:block;cursor:pointer}
+.sg input:not([type=range]):not([type=checkbox]):not([type=file]):not(.num),textarea{width:100%;background:var(--inp);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px;font:inherit;font-size:12px}
+textarea{resize:vertical}
+.li{background:var(--inp);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px}
+.li b{display:block;font-size:13px}.li small{color:var(--mut);font-size:10px;line-height:1.7}
+</style>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#101214"><meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+<div id="pairBar" style="display:none;position:sticky;top:0;z-index:99;background:#ffb020;color:#000;text-align:center;padding:10px;font-weight:700;cursor:pointer" onclick="connectInput()">🔵 اضغط هنا للاقتران بالجهاز</div>
+<header><span class="ttl">🕳️ منظومة مسح الكهوف الذكية</span><span class="own">Murad Hasan Alhasheesh</span></header>
+<main>
+
+<section class="pn on" id="p0">
+  <input type="hidden" id="smode" value="grid">
+  <div class="seg"><button id="smg" class="on" onclick="setSM('grid')">🔲 شبكة</button><button id="smc" onclick="setSM('compass')">⭕ فرجار</button></div>
+  <div class="row" id="gHead">
+    <label>أسطر <input class="num" id="rows" type="number" inputmode="numeric" min="2" max="40" value="5"></label>
+    <label>أعمدة <input class="num" id="cols" type="number" inputmode="numeric" min="2" max="40" value="5"></label>
+    <button onclick="applyDims()">تطبيق</button><button onclick="clearAll()">مسح</button><button onclick="flipSign()">±</button>
+  </div>
+  <p class="hint" id="gHint"><span class="b-h">H</span> لكل سطر · <span class="b-v">V</span> لكل عمود · امسح حقلي خلية لاستثنائها · Enter للحقل التالي</p>
+  <div class="ch" id="cHead" style="display:none">
+    <div class="cp">
+      <label>نق₀ (م)<input class="num" id="cr0" type="text" inputmode="decimal" value="2" title="نصف قطر المدار الأول = الخطوة بين المدارات"></label>
+      <label>الدوائر<input class="num" id="cnr" type="text" inputmode="numeric" value="3"></label>
+      <label>عيّنات/مدار<input class="num" id="cns" type="text" inputmode="numeric" value="12" title="عدد الشعاعات: نفس العدد في كل المدارات"></label>
+      <label>القوس (م)<input class="num" id="cas" type="text" inputmode="decimal" value="1"></label>
+      <label style="display:none"><input class="num" id="crs" type="text" value="2"></label>
+    </div>
+    <div class="opt">
+      <label class="chk"><input type="checkbox" id="csub" checked onchange="try{localStorage.setItem('cave-csub',this.checked?'1':'0')}catch(e){}changed()"> اطرح المدار الأول</label>
+      <label class="chk"><input type="checkbox" id="one" checked onchange="try{localStorage.setItem('cave-one',this.checked?'1':'0')}catch(e){}changed()"> قبول قمة بدائرة واحدة</label>
+      <label class="chk">الإدخال <select id="cview" onchange="setCView()"><option value="circle">دائرة</option><option value="rows">سطور</option></select></label>
+    </div>
+    <div class="act"><button class="pri" onclick="applyC()">تطبيق</button><button onclick="clearC()">مسح</button><button onclick="flipSign()">±</button></div>
+  </div>
+  <p class="hint" id="cHint" style="display:none"></p>
+  <div class="fl"><table id="tin"></table><div id="cin" style="display:none"></div></div>
+  <button class="p" onclick="run()">معالجة وعرض الخريطة</button>
+</section>
+
+<section class="pn" id="p1">
+  <div class="seg"><button id="bn" class="on" onclick="setMV('num')">الأرقام</button><button id="bm" onclick="setMV('map')">شكل الفراغ</button></div>
+  <div class="fl" style="display:flex;align-items:center;justify-content:center"><div id="tw" style="max-height:100%;overflow:auto"><table id="tres"></table></div><canvas id="cv"></canvas><div id="cres" style="display:none;max-height:100%;overflow:auto;width:100%"></div><canvas id="ccv"></canvas></div>
+  <div class="lg"><span id="lo"></span><div class="bar" id="bar"></div><span id="hi"></span></div>
+  <div id="info">المس خلية أو مرر على الخريطة لعرض قيمتها</div>
+</section>
+
+<section class="pn" id="p2">
+  <div class="seg"><button id="m1" class="on" onclick="setMode(1)">تحت الأرض (الكهف)</button><button id="m2" onclick="setMode(2)">سطح القيم</button></div>
+  <div class="fl"><canvas id="c3"></canvas></div>
+  <div class="row z"><label>تضخيم العمق <input type="range" id="vx" min="10" max="40" value="10" oninput="r3()"></label><label><input type="checkbox" id="ar" onchange="loop()"> دوران</label><button onclick="reset3()">↺</button></div>
+  <div class="row"><label>حجم الكتابة <input type="range" id="ts" min="33" max="100" value="33" oninput="setTS()"></label></div>
+  <div id="tg"></div>
+</section>
+
+<section class="pn" id="p3">
+  <div class="fl">
+    <h3 style="margin-top:2px">العرض</h3>
+    <div class="sg">
+      <label>القيمة <select id="metric" onchange="changed()"><option value="m">المحصلة</option><option value="x">تقاطع H×V (إزالة الأشباح)</option><option value="h">H فقط</option><option value="v">V فقط</option></select></label>
+      <label>الألوان <select id="cmap" onchange="changed()"><option value="viridis">Viridis</option><option value="turbo">Turbo</option><option value="inferno">Inferno</option><option value="classic">أزرق–أحمر</option></select></label>
+      <label class="w2" style="flex-direction:row"><input type="checkbox" id="clip" onchange="changed()"> قص الشواذ (5–95%)</label>
+      <label class="w2" style="flex-direction:row"><input type="checkbox" id="shw" checked onchange="changed()"> إظهار حدود الكهف على الخريطة</label>
+      <label class="w2">ما ليس كهفاً (الأشباح) <select id="ghost" onchange="changed()"><option value="off">يُعرض كما هو</option><option value="dim">يُضعَّف (باهت)</option><option value="hide">يُخفى بالكامل</option></select></label>
+    </div>
+    <h3>الوحدات (مقاومة ظاهرية)</h3>
+    <div class="sg">
+      <label class="w2">ترتيب الأقطاب <select id="arr" onchange="arrUI();changed()"><option value="raw">قراءة خام (بدون تحويل)</option><option value="wen">Wenner</option><option value="pp">Pole–Pole</option><option value="sch">Schlumberger</option><option value="dd">Dipole–Dipole</option></select></label>
+      <label id="eal"><span>تباعد الأقطاب a (م)</span><input class="num" id="ea" type="text" inputmode="decimal" value="1" oninput="arrUI();changed()"></label>
+      <label id="exl"><span id="exs">n</span><input class="num" id="ee" type="text" inputmode="decimal" value="1" oninput="arrUI();changed()"></label>
+    </div>
+    <p id="kinfo" class="hint" style="text-align:start;margin-top:6px"></p>
+    <h3>تحديد الكهف</h3>
+    <div class="sg">
+      <label class="w2">طريقة التحليل <select id="amode" onchange="changed()"><option value="lines">خطوط متقاطعة (طريقتنا)</option><option value="cells">خلايا ثنائية البعد</option></select></label>
+      <label class="w2">نوع الشذوذ <select id="atype" onchange="changed()"><option value="high">فراغ هوائي (مقاومة أعلى)</option><option value="low">ماء أو طين أو معدن (مقاومة أقل)</option></select></label>
+      <label>بين الأعمدة (م) <input class="num" id="dx" type="text" inputmode="decimal" value="1" oninput="changed()"></label>
+      <label>بين الأسطر (م) <input class="num" id="dy" type="text" inputmode="decimal" value="1" oninput="changed()"></label>
+      <label class="w2">عتبة الحدود: <span id="thv">50%</span><input type="range" id="thr" min="20" max="80" value="50" oninput="$('thv').textContent=this.value+'%';changed()"></label>
+      <label>معامل العمق k <input class="num" id="kd" type="text" inputmode="decimal" value="1" oninput="changed()"></label>
+      <label>الارتفاع/العرض <input class="num" id="hr" type="text" inputmode="decimal" value="0.6" oninput="changed()"></label>
+      <label>هامش عدم اليقين % <input class="num" id="ut" type="text" inputmode="decimal" value="30" oninput="changed()"></label>
+      <label>طول الخط L (م) <input class="num" id="ll" type="text" inputmode="decimal" value="10" oninput="changed()"></label>
+      <label>مدى الاستقصاء α <input class="num" id="al" type="text" inputmode="decimal" value="0.4" oninput="changed()"></label>
+    </div>
+    <p class="hint" style="text-align:start;margin-top:10px">طريقة الخطوط: تُؤخذ قيمة واحدة لكل سطر H ولكل عمود V، وموضع الكهف وحدوده من تقاطع الشذوذين. العمق ≈ k × نصف عرض الشذوذ عند نصف الارتفاع، والارتفاع = النسبة × العرض، ومدى الاستقصاء ≈ α × L. كلها تقديرية؛ عايِر k وα والنسبة على كهف معروف.</p>
+    <div class="row" style="margin-top:10px"><button onclick="copyCSV()">نسخ CSV</button><span id="cp" class="hint"></span></div>
+
+    <h3>الفرجار</h3>
+    <div class="sg"><label class="w2">اتجاه الزاوية (الصفر نحو الأعلى) <select id="cdir" onchange="changed()"><option value="cw">مع عقارب الساعة</option><option value="ccw">عكس عقارب الساعة</option></select></label></div>
+    <p class="hint" style="text-align:start;margin-top:6px">عتبة الحدود وk والنسبة وα وهامش عدم اليقين تُستخدم في النمطين. أنصاف أقطار الدوائر وطول القوس تُضبط من تبويب القراءات في نمط الفرجار.</p>
+    <h3>الاتصال بالجهاز (Bluetooth BLE)</h3>
+    <div class="sg">
+      <label class="w2">صيغة البيانات <select id="dataFormat"><option value="auto">تلقائي: سطر/عمود أو H/V</option><option value="seqH">قيمة متتابعة لقناة H</option><option value="seqV">قيمة متتابعة لقناة V</option><option value="seqPair">قيمتان متتابعتان H,V في كل سطر</option><option value="rings">دوائر الفرجار: RING_BEGIN … RING_DONE</option><option value="rowColPhases">مرحلتان: الصفوف ثم الأعمدة (ESP32)</option></select></label>
+      <label class="w2" id="seqOrderRow" style="display:none">ترتيب تعبئة الشبكة <select id="seqOrder"><option value="row">سطرًا سطرًا</option><option value="col">عمودًا عمودًا</option></select></label>
+      <button class="w2" id="resetSeqBtn" onclick="resetSequence()" style="display:none">إعادة مؤشر التعبئة إلى أول خلية</button>
+      <button class="w2" id="connectBtn" onclick="connectInput()">اقتران / اتصال بالجهاز</button>
+      <button class="w2" id="disconnectBtn" onclick="disconnectInput()" style="display:none">قطع الاتصال</button>
+      <div class="w2 hint" id="connStatus">جارٍ تجهيز الاتصال التلقائي…</div>
+      <div class="w2 hint" id="rxCnt">الوارد من الجهاز: 0 بايت</div>
+      <pre class="w2 hint" id="rxLog" style="direction:ltr;text-align:left;max-height:150px;overflow:auto;white-space:pre-wrap;font-size:11px;margin:0">— لا توجد بيانات واردة بعد —</pre>
+      <div class="w2 hint" style="margin-top:6px"><b>تحكم بالجهاز</b></div>
+      <button class="w2" onclick="sendCmd('TRIGGER')">📏 قياس الآن</button>
+      <button class="w2" onclick="sendCmd('RESET')">⟲ إعادة المؤشر في الجهاز</button>
+      <button class="w2" onclick="sendDims()">⇪ إرسال الأبعاد/النمط للجهاز</button>
+      <button class="w2" onclick="undoLast()">↶ تراجع عن آخر قراءة</button>
+      <div class="w2 hint" style="margin-top:6px"><b>بيانات المسح</b></div>
+      <label class="w2">اسم الموقع <input id="mSite" type="text" oninput="metaSave()"></label>
+      <label class="w2">ملاحظات <input id="mNotes" type="text" oninput="metaSave()"></label>
+      <button class="w2" onclick="getGps()">📍 تسجيل الموقع GPS</button>
+      <div class="w2 hint" id="mGps">لم يُسجَّل موقع</div>
+      <button class="w2" onclick="exportJSON()">💾 تصدير نسخة كاملة (JSON)</button>
+      <button class="w2" onclick="exportCSV()">📄 تصدير النتائج (CSV)</button>
+      <label class="w2">استيراد نسخة <input type="file" accept=".json,application/json" onchange="importJSON(this)"></label>
+    </div>
+    <p class="hint" style="text-align:start;margin-top:6px">بروتوكول مرحلتي ESP32 (سطر واحد لكل أمر/قيمة، ينتهي بـ \n):<br>
+    <b>ROWS_BEGIN</b> ← ثم R×C قيمة (سطرًا سطرًا) تملأ قناة <b>H</b> ← <b>ROWS_DONE</b><br>
+    <b>COLS_BEGIN</b> ← ثم R×C قيمة (عمودًا عمودًا) تملأ قناة <b>V</b> ← <b>COLS_DONE</b><br>
+    يبدأ الترقيم من الصف/العمود 1. أي نص آخر أثناء مرحلة يُفسَّر كرقم.</p>
+    <p class="hint" style="text-align:start;margin-top:6px">الصيغ المفهرسة: <b>H,سطر,عمود,قيمة</b> أو <b>V,سطر,عمود,قيمة</b>، وكذلك <b>سطر,عمود,H,V</b>. وللقراءات المتتابعة اختر صيغة البيانات المناسبة؛ في وضع H,V أرسل قيمتين في كل سطر بهذا الترتيب. يبدأ ترقيم الأسطر والأعمدة من 1.</p>
+    <p class="hint" style="text-align:start">الاتصال عبر Bluetooth BLE فقط (Nordic UART) مع الجهاز <b>Murad-Cave-Scanner</b>. يعمل في Chrome/Edge على أندرويد والحاسوب ضمن صفحة HTTPS، ولا يعمل في Safari/iPhone. أول مرة: اضغط أي مكان في الصفحة لاختيار الجهاز، وبعدها يتصل تلقائياً ويعيد الاتصال عند الانقطاع.</p>
+  </div>
+</section>
+
+<section class="pn" id="p4">
+  <div class="fl">
+    <h3 style="margin-top:2px">المسح الحالي</h3>
+    <div class="sg">
+      <label class="w2">اسم المسح <input id="surveyName" type="text" placeholder="مثال: المسح الشمالي"></label>
+      <label class="w2">ملاحظات (الموقع، الطقس، التربة…) <textarea id="surveyNotes" rows="2"></textarea></label>
+      <button onclick="saveToLib()">💾 حفظ في القائمة</button>
+      <button onclick="newSurvey()">➕ مسح جديد</button>
+    </div>
+    <h3>المسوح المحفوظة</h3>
+    <div id="lib"></div>
+    <h3>تصدير واستيراد</h3>
+    <div class="sg">
+      <button onclick="exportFile()">تنزيل ملف JSON</button>
+      <button onclick="$('surveyFile').click()">فتح ملف</button>
+      <button onclick="copyJSON()">نسخ JSON</button>
+      <button onclick="importText($('jsonBox').value)">استيراد من النص</button>
+      <button class="w2" onclick="copyReport()">نسخ تقرير نصي للنتائج</button>
+      <textarea class="w2" id="jsonBox" rows="3" placeholder="هنا يظهر JSON عند النسخ، أو الصق ملف مسح ثم اضغط «استيراد من النص»"></textarea>
+      <input id="surveyFile" type="file" accept=".json,application/json" style="display:none" onchange="loadSurveyFile(this.files[0]);this.value=''">
+    </div>
+    <div id="saveMsg" class="hint" style="margin-top:8px"></div>
+  </div>
+</section>
+
+</main>
+<nav>
+  <button class="on" onclick="setTab(0)"><i>✏️</i>القراءات</button>
+  <button onclick="setTab(1)"><i>🗺️</i>الخريطة</button>
+  <button onclick="setTab(2)"><i>🧊</i>ثلاثي الأبعاد</button>
+  <button onclick="setTab(3)"><i>⚙️</i>الإعدادات</button>
+  <button onclick="setTab(4)"><i>💾</i>الحفظ</button>
+</nav>
+<footer>جميع حقوق الحماية محفوظة © Murad Hasan Alhasheesh 2024</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const STOPS={viridis:['#440154','#3b528b','#21918c','#5ec962','#fde725'],turbo:['#30123b','#4669dc','#1ac7c2','#a2fc3c','#fabb39','#e6550d','#7a0403'],inferno:['#000004','#57106e','#bc3754','#f98e09','#fcffa4'],classic:['#0028ff','#ff2800']};
+const RGB={};for(const k in STOPS)RGB[k]=STOPS[k].map(h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16)));
+const KEY='cave-survey-v2',sm=f=>f*f*(3-2*f),SET=['dx','dy','atype','thr','kd','hr','arr','ea','ee','ut','amode','ll','al','smode','cr0','crs','cnr','cas','cdir','cns'];
+let R=5,C=5,D=null,lo=0,hi=1,lastIn=null,timer=null,tab=0,mv='num',mode=1,sel=0,raf=0,P3=null,G3={dx:1,dy:1},cam={yaw:.5,p:.55,z:3},TG=[],MASK=null,CID=null,DEV=null,FR=.5,SV=0,SW=0,UN='',GHM=false,CD=null,CRAW=null,CRAD=[],CN=[],CNORM=null,GTG=null;
+
+function norm(s){return s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫,]/g,'.').replace(/[−–]/g,'-').trim()}
+function num(el){if(!el)return null;const s=norm(el.value);if(s===''||s==='-')return null;const x=parseFloat(s);return isNaN(x)?null:x}
+function cm(t){const S=RGB[$('cmap').value]||RGB.viridis,n=S.length-1;t=Math.max(0,Math.min(1,isNaN(t)?0:t));const x=t*n,i=Math.min(n-1,Math.floor(x)),f=x-i;return S[i].map((c,k)=>c+(S[i+1][k]-c)*f)}
+const rgb=(c,s=1)=>`rgb(${Math.round(c[0]*s)},${Math.round(c[1]*s)},${Math.round(c[2]*s)})`;
+const T=x=>(hi-lo===0)?0:(x-lo)/(hi-lo);
+function fmt(x){if(x===null||isNaN(x))return'–';const a=Math.abs(x);if(a>=1000)return(x/1000).toFixed(1)+'k';return(hi-lo)<10?x.toFixed(2):(hi-lo)<100?x.toFixed(1):x.toFixed(0)}
+
+/* ---------- التبويبات ---------- */
+function setTab(n){
+ if((n===1||n===2)&&!(isComp()?CD:D)&&!refresh(true))return;
+ tab=n;document.querySelectorAll('.pn').forEach((p,i)=>p.classList.toggle('on',i===n));document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',i===n));
+ cancelAnimationFrame(raf);if(n===2){requestAnimationFrame(r3);loop()}if(n===4)renderLib()}
+function setMV(v){mv=v;const c=isComp();$('bn').classList.toggle('on',v==='num');$('bm').classList.toggle('on',v==='map');$('tw').style.display=(!c&&v==='num')?'':'none';$('cv').style.display=(!c&&v==='map')?'block':'none';$('cres').style.display=(c&&v==='num')?'':'none';$('ccv').style.display=(c&&v==='map')?'block':'none'}
+function setMode(n){mode=n;$('m1').classList.toggle('on',n===1);$('m2').classList.toggle('on',n===2);(isComp()?build3C:build3)();r3()}
+
+/* ---------- الإدخال ---------- */
+function inp(cls,ph,id){const e=document.createElement('input');e.type='text';e.inputMode='decimal';e.autocomplete='off';e.className=cls;e.placeholder=ph;e.id=id;
+ e.addEventListener('focus',()=>lastIn=e);
+ e.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();const a=[...(e.closest('#tin')||e.closest('#cin')||document).querySelectorAll('input')],k=a.indexOf(e);(a[k+1]||e).focus()}});return e}
+function build(){
+ const t=$('tin');t.innerHTML='';
+ const hr=t.insertRow();hr.appendChild(document.createElement('th'));
+ const corner=document.createElement('th');corner.innerHTML='<span class="axis-corner">yᵢ</span><span class="axis-corner">╲</span><span class="axis-corner">xⱼ</span>';hr.replaceChild(corner,hr.firstChild);
+ for(let j=0;j<C;j++){const th=document.createElement('th'),e=inp('hd v','V'+(j+1),'cv'+j);e.title='X'+(j+1)+' — أدخل قيمة لتعبئة قناة V في العمود كله';e.setAttribute('aria-label','X '+(j+1)+'، تعبئة قناة V للعمود');e.oninput=()=>fillCol(j,e.value);th.appendChild(e);hr.appendChild(th)}
+ for(let i=0;i<R;i++){
+  const tr=t.insertRow(),th=document.createElement('th'),e=inp('hd h','H'+(i+1),'rh'+i);e.title='Y'+(i+1)+' — أدخل قيمة لتعبئة قناة H في الصف كله';e.setAttribute('aria-label','Y '+(i+1)+'، تعبئة قناة H للصف');e.oninput=()=>fillRow(i,e.value);th.appendChild(e);tr.appendChild(th);
+  for(let j=0;j<C;j++){
+   const td=tr.insertCell(),w=document.createElement('div');w.className='hv';w.id='w'+i+'_'+j;
+   const h=inp('g h','H','h'+i+'_'+j),v=inp('g v','V','v'+i+'_'+j);
+   [h,v].forEach(x=>x.addEventListener('input',()=>{w.classList.toggle('off',h.value.trim()===''&&v.value.trim()==='');w.dataset.off=w.classList.contains('off')?1:'';changed()}));
+   w.append(h,v);td.appendChild(w)}}}
+function fillRow(i,val){for(let j=0;j<C;j++){if($('w'+i+'_'+j).dataset.off)continue;$('h'+i+'_'+j).value=val}changed()}
+function fillCol(j,val){for(let i=0;i<R;i++){if($('w'+i+'_'+j).dataset.off)continue;$('v'+i+'_'+j).value=val}changed()}
+function flipSign(){if(!lastIn)return;const s=lastIn.value.trim();lastIn.value=s.startsWith('-')?s.slice(1):'-'+s;lastIn.dispatchEvent(new Event('input'));lastIn.focus()}
+function hasAnyReading(){return hasAnyGrid()||hasAnyC()}
+function hasAnyGrid(){for(let i=0;i<R;i++)for(let j=0;j<C;j++){if($('h'+i+'_'+j).value.trim()!==''||$('v'+i+'_'+j).value.trim()!=='')return true}return false}
+let devApplying=false;
+function isConnected(){return !!(bleDevice&&bleDevice.gatt&&bleDevice.gatt.connected&&bleCharacteristic)}
+function resetRxState(){seqIndex=0;phaseMode='idle';rxBuffer='';ringK=-1;ringM=0}
+function applyDims(){
+ if(isConnected()&&!devApplying){alert('اقطع الاتصال أولاً قبل تغيير أبعاد الشبكة');return}
+ const r=parseInt($('rows').value),c=parseInt($('cols').value);
+ if(!(r>=2&&r<=40&&c>=2&&c<=40)){alert('أدخل أبعاداً بين 2 و 40');return}
+ if((r!==R||c!==C)&&hasAnyGrid()&&!confirm('تغيير الأبعاد سيمسح القراءات الحالية. هل تريد المتابعة؟'))return;
+ R=r;C=c;D=null;resetRxState();build();save()}
+function clearAll(){
+ if(isConnected()&&!devApplying){alert('اقطع الاتصال أولاً قبل مسح القراءات');return}
+ if(hasAnyGrid()&&!confirm('هل تريد مسح جميع القراءات؟'))return;
+ document.querySelectorAll('#tin input').forEach(e=>e.value='');
+ document.querySelectorAll('.hv').forEach(w=>{w.classList.remove('off');w.dataset.off=''});
+ resetRxState();changed()}
+
+/* ---------- الحساب ---------- */
+/* فلتر التقاطع: الخلية كهف فقط إذا شذّ سطرها (H) وعمودها (V) معاً -> الأضعف منهما */
+function xscore(){
+ const hiT=$('atype').value==='high',H=[],V=[],hs=[],vs=[];
+ for(let i=0;i<R;i++){H[i]=[];V[i]=[];for(let j=0;j<C;j++){const h=num($('h'+i+'_'+j)),v=num($('v'+i+'_'+j));H[i][j]=h;V[i][j]=v;if(h!==null)hs.push(h);if(v!==null)vs.push(v)}}
+ const med=a=>{if(!a.length)return 0;a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2};
+ const bh=med(hs),bv=med(vs),s=(x,b)=>x===null?null:Math.max(0,hiT?x-b:b-x);
+ let mh=0,mv=0;
+ const SH=H.map(r=>r.map(x=>{const y=s(x,bh);if(y>mh)mh=y;return y})),SV2=V.map(r=>r.map(x=>{const y=s(x,bv);if(y>mv)mv=y;return y}));
+ const useH=hs.length>0,useV=vs.length>0;
+ return H.map((r,i)=>r.map((_,j)=>{
+  const a=SH[i][j],b=SV2[i][j];if(a===null&&b===null)return null;
+  const na=useH?(a===null||mh<=0?0:a/mh):null,nb=useV?(b===null||mv<=0?0:b/mv):null;
+  return 100*(na===null?nb:nb===null?na:Math.min(na,nb))}))}
+/* معامل الهندسة K للتحويل إلى مقاومة ظاهرية ρa = K × R */
+function getK(){
+ const t=$('arr').value,a=num($('ea'))||1,e=num($('ee'))||1;
+ if(t==='wen'||t==='pp')return{K:2*Math.PI*a,u:' Ω·م'};
+ if(t==='sch'){const l=a/2;return e>l?{K:Math.PI*(e*e-l*l)/(2*l),u:' Ω·م'}:{K:1,u:'',bad:1}}
+ if(t==='dd'){const n=Math.max(1,Math.round(e));return{K:Math.PI*n*(n+1)*(n+2)*a,u:' Ω·م'}}
+ return{K:1,u:''}}
+function arrUI(){
+ const t=$('arr').value,k=getK();
+ $('eal').style.display=t==='raw'?'none':'';$('exl').style.display=(t==='sch'||t==='dd')?'':'none';
+ $('exs').textContent=t==='sch'?'AB/2 (م) — وa هي MN':'n (رقم الفاصل)';
+ $('kinfo').textContent=t==='raw'?'القراءات تُعرض كما أُدخلت (بلا وحدة).':k.bad?'⚠ يجب أن يكون AB/2 أكبر من نصف MN.':'ρa = K × القراءة ، حيث K ≈ '+k.K.toFixed(2)+' م'}
+function compute(){
+ const m=$('metric').value,M=[],vals=[],KK=getK(),X=m==='x'?xscore():null;UN=m==='x'?' /100':KK.u;
+ for(let i=0;i<R;i++){M[i]=[];for(let j=0;j<C;j++){
+  const h=num($('h'+i+'_'+j)),v=num($('v'+i+'_'+j));
+  if(h===null&&v===null){M[i][j]=null;continue}
+  const x=m==='x'?X[i][j]:(m==='h'?(h??0):m==='v'?(v??0):Math.hypot(h||0,v||0))*KK.K;M[i][j]=x;vals.push(x)}}
+ if(!vals.length){D=null;return false}
+ const s=[...vals].sort((a,b)=>a-b),q=p=>s[Math.min(s.length-1,Math.max(0,Math.round(p*(s.length-1))))],cl=$('clip').checked&&s.length>=6;
+ lo=cl?q(.05):s[0];hi=cl?q(.95):s[s.length-1];if(hi-lo<1e-12)hi=lo+1;D=M;return true}
+function run(){if(refresh(true))setTab(1)}
+function refresh(force){if(!(isComp()?computeC():compute())){if(force)alert('لم تُدخل أي بيانات');return false}draw();return true}
+function changed(){save();clearTimeout(timer);timer=setTimeout(()=>{if(isComp()?CD:D)refresh()},200)}
+function draw(){if(isComp()){drawC();return}analyze();GTG=TG.map(t=>({cy:t.cy,cx:t.cx}));buildTable();map();build3();showTG();setMV(mv);if(tab===2)r3()}
+
+function buildTable(){
+ const t=$('tres');t.innerHTML='';
+ const hr=t.insertRow();hr.appendChild(document.createElement('th'));
+ for(let j=0;j<C;j++){const th=document.createElement('th');th.textContent=j+1;hr.appendChild(th)}
+ for(let i=0;i<R;i++){const tr=t.insertRow(),th=document.createElement('th');th.textContent=i+1;tr.appendChild(th);
+  for(let j=0;j<C;j++){const td=tr.insertCell(),x=D[i][j];td.className='rc';
+   if(x===null){td.textContent='–';td.style.color='var(--mut)'}
+   else{const c=cm(T(x));td.textContent=fmt(x);td.style.background=rgb(c);td.style.color=(.299*c[0]+.587*c[1]+.114*c[2])>150?'#000':'#fff';td.onclick=()=>info(i,j);
+    if(GHM&&MASK&&!MASK[i][j])td.style.opacity='.28';if(MASK&&MASK[i][j]&&$('shw').checked){td.style.outline='2px solid #fff';td.style.outlineOffset='-2px'}}}}
+ $('lo').textContent=fmt(lo)+UN;$('hi').textContent=fmt(hi)+UN;
+ $('bar').style.background=`linear-gradient(to right,${Array.from({length:9},(_,k)=>rgb(cm(k/8))).join(',')})`}
+
+/* عيّنة مُنعَّمة تتجاهل الخلايا الفارغة -> SV (القيمة) و SW (الوزن) */
+function sam(F,gx,gy){const x0=Math.floor(gx),y0=Math.floor(gy),fx=sm(gx-x0),fy=sm(gy-y0);let sw=0,sv=0;
+ for(let p=0;p<2;p++)for(let q=0;q<2;q++){const x=F[Math.min(R-1,Math.max(0,y0+p))][Math.min(C-1,Math.max(0,x0+q))];if(x===null)continue;const w=(p?fy:1-fy)*(q?fx:1-fx);sw+=w;sv+=w*x}
+ SW=sw;SV=sw>0?sv/sw:0}
+/* ---------- رسم عالي الجودة: لوحة بدقة الشاشة + حقل مُنعَّم + رسوم متجهية حادة ---------- */
+let TMPCV=null,CS_S=560;
+/* يضبط اللوحة بدقة الشاشة (Retina) ويُبقي الإحداثيات المنطقية كما هي w×h */
+function prepCanvas(cv,w,h){
+ const dp=Math.min(2,window.devicePixelRatio||1);
+ cv.width=Math.round(w*dp);cv.height=Math.round(h*dp);
+ cv.style.width=w+'px';cv.style.height='auto';
+ const ctx=cv.getContext('2d');ctx.setTransform(dp,0,0,dp,0,0);ctx.clearRect(0,0,w,h);return ctx}
+function tmpCanvas(w,h){if(!TMPCV)TMPCV=document.createElement('canvas');TMPCV.width=w;TMPCV.height=h;return TMPCV}
+/* جدول ألوان مسبق الحساب (بدل استدعاء cm() لكل بكسل) */
+function colLUT(){const n=512,L=new Uint8ClampedArray(n*3);for(let i=0;i<n;i++){const c=cm(i/(n-1));L[i*3]=c[0];L[i*3+1]=c[1];L[i*3+2]=c[2]}return L}
+function lutIdx(t){t=(t>0)?(t<1?t:1):0;return((t*511+.5)|0)*3}
+function map(){
+ const S=Math.max(12,Math.min(64,Math.floor(640/Math.max(R,C)))),W=C*S,H=R*S,ctx=prepCanvas($('cv'),W,H),L=colLUT();
+ const tc=tmpCanvas(W,H),tx=tc.getContext('2d'),img=tx.createImageData(W,H),d=img.data;
+ for(let py=0;py<H;py++){const gy=(py+.5)/S-.5;
+  for(let px=0;px<W;px++){const gx=(C-1)-((px+.5)/S-.5);sam(D,gx,gy);if(SW<=.02)continue;
+   const gf=(GHM&&MASK&&!MASK[Math.min(R-1,Math.max(0,Math.round(gy)))][Math.min(C-1,Math.max(0,Math.round(gx)))])?.25:1;
+   const k=lutIdx(T(SV)),o=(py*W+px)*4;d[o]=L[k];d[o+1]=L[k+1];d[o+2]=L[k+2];d[o+3]=Math.max(0,Math.min(1,(SW-.3)/.45))*255*gf}}
+ tx.putImageData(img,0,0);
+ ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(tc,0,0,W,H);
+ outline(ctx,S)}
+function outline(ctx,S){
+ if(!MASK||!$('shw').checked)return;
+ const mk=(i,j)=>i>=0&&i<R&&j>=0&&j<C&&MASK[i][j];
+ ctx.save();ctx.strokeStyle='#fff';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.lineWidth=Math.max(2,S/12);ctx.setLineDash([S/4,S/6]);ctx.beginPath();
+ for(let i=0;i<R;i++)for(let j=0;j<C;j++)if(MASK[i][j]){const x=(C-1-j)*S,y=i*S;
+  if(!mk(i-1,j)){ctx.moveTo(x,y);ctx.lineTo(x+S,y)}
+  if(!mk(i+1,j)){ctx.moveTo(x,y+S);ctx.lineTo(x+S,y+S)}
+  if(!mk(i,j+1)){ctx.moveTo(x,y);ctx.lineTo(x,y+S)}
+  if(!mk(i,j-1)){ctx.moveTo(x+S,y);ctx.lineTo(x+S,y+S)}}
+ ctx.stroke();ctx.restore()}
+function info(i,j){const x=D[i][j];if(x===null){$('info').textContent='س'+(i+1)+' · ع'+(j+1)+' : بلا قراءة';return}
+ const h=num($('h'+i+'_'+j)),v=num($('v'+i+'_'+j));$('info').textContent=`س${i+1} · ع${j+1} : H=${h??'–'}  V=${v??'–'}  ⟵  ${x.toFixed(2)}${UN}`}
+function pick(ev){const r=$('cv').getBoundingClientRect();
+ info(Math.min(R-1,Math.max(0,Math.floor((ev.clientY-r.top)/r.height*R))),C-1-Math.min(C-1,Math.max(0,Math.floor((ev.clientX-r.left)/r.width*C))))}
+$('cv').addEventListener('pointermove',pick);$('cv').addEventListener('pointerdown',pick);
+
+/* ---------- تحليل الكهف: طريقة الخطوط المتقاطعة ---------- */
+function lineProfile(vals,hiT){
+ const v=vals.filter(x=>x!==null);if(v.length<3)return null;
+ const med=a=>{a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2};
+ /* الخلفية = وسيط النصف «الهادئ» من الخطوط (الأخفض للفراغ الهوائي، الأعلى للماء/الطين) كي لا يفسدها كهف عريض */
+ const q=[...v].sort((p,r)=>hiT?p-r:r-p).slice(0,Math.ceil(v.length/2)),bg=med(q),sig=1.4826*med(q.map(x=>Math.abs(x-bg)));
+ const s=vals.map(x=>x===null?0:Math.max(0,hiT?x-bg:bg-x)),mx=Math.max(...s);
+ if(!(mx>0)||mx<Math.max(3*sig,.05*Math.abs(bg)))return null;
+ return{s,bg,mx,n:s.map(x=>x/mx)}}
+function widthAt(s,pk,lvl){
+ let l=pk,r=pk;while(l>0&&s[l-1]>=lvl)l--;while(r<s.length-1&&s[r+1]>=lvl)r++;
+ const e=(l===0)||(r===s.length-1);
+ const xl=l===0?-.5:(l-1)+(lvl-s[l-1])/(s[l]-s[l-1]),xr=r===s.length-1?s.length-.5:r+(s[r]-lvl)/(s[r]-s[r+1]);
+ return{w:Math.max(.5,xr-xl),e}}
+function lineRuns(p,fr){
+ const lvl=fr*p.mx,s=p.s,out=[];let i=0;
+ while(i<s.length){
+  if(s[i]>=lvl&&s[i]>0){let j=i;while(j+1<s.length&&s[j+1]>=lvl)j++;
+   let pk=i,sw=0,wc=0;for(let k=i;k<=j;k++){if(s[k]>s[pk])pk=k;sw+=s[k];wc+=k*s[k]}
+   const t=widthAt(s,pk,lvl),h=widthAt(s,pk,.5*s[pk]);
+   out.push({i0:i,i1:j,cen:wc/sw,pk:s[pk],wt:t.w,w5:h.w,edge:t.e});i=j+1}else i++}
+ return out}
+function analyzeLines(dx,dy,fr,kk,rr,ut,hiT){
+ const med=a=>{if(!a.length)return null;a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2};
+ const rowH=[],colV=[];
+ for(let i=0;i<R;i++){const a=[];for(let j=0;j<C;j++){const x=num($('h'+i+'_'+j));if(x!==null)a.push(x)}rowH[i]=med(a)}
+ for(let j=0;j<C;j++){const a=[];for(let i=0;i<R;i++){const x=num($('v'+i+'_'+j));if(x!==null)a.push(x)}colV[j]=med(a)}
+ const ph=lineProfile(rowH,hiT),pv=lineProfile(colV,hiT);if(!ph||!pv)return false;
+ const rh=lineRuns(ph,fr),rv=lineRuns(pv,fr);if(!rh.length||!rv.length)return false;
+ const amb=rh.length>1&&rv.length>1,all=[];
+ rh.forEach(a=>rv.forEach(b=>{
+  const Ly=a.wt*dy,Lx=b.wt*dx,w50y=a.w5*dy,w50x=b.w5*dx,Wm=Math.min(Lx,Ly),Lm=Math.max(Lx,Ly);
+  const zx=kk*w50x/2,zy=kk*w50y/2,zc0=kk*Math.min(w50x,w50y)/2,h0=rr*Wm,roof=Math.max(0,zc0-h0/2),floor=zc0+h0/2,H=floor-roof,cells=[];
+  for(let i=a.i0;i<=a.i1;i++)for(let j=b.i0;j<=b.i1;j++)cells.push([i,j]);
+  all.push({L:Lm,W:Wm,Lx,Ly,roof,floor,H,zc:(roof+floor)/2,vol:Math.PI/6*Lx*Ly*H,cy:a.cen,cx:b.cen,zx,zy,amb,
+   eR:Math.hypot(ut*roof,.5*Math.max(dx,dy)),eF:Math.hypot(ut*floor,.5*Math.max(dx,dy)),
+   pct:Math.min(a.pk/Math.abs(ph.bg||1),b.pk/Math.abs(pv.bg||1))*100,sum:(a.pk/ph.mx)*(b.pk/pv.mx),edge:a.edge||b.edge,small:Wm<2*Math.max(dx,dy),cells})}));
+ all.sort((a,b)=>b.sum-a.sum);TG=all.filter(r=>r.sum>=.1*all[0].sum).slice(0,4);
+ MASK=D.map(r=>r.map(()=>false));CID=D.map(r=>r.map(()=>-1));
+ TG.forEach((r,k)=>r.cells.forEach(([a,b])=>{MASK[a][b]=true;CID[a][b]=k}));
+ DEV=Array.from({length:R},(_,i)=>Array.from({length:C},(_,j)=>Math.min(ph.n[i],pv.n[j])));
+ if($('ghost').value==='hide')D=D.map((r,i)=>r.map((x,j)=>MASK[i][j]?x:null));
+ return true}
+
+/* ---------- تحليل الكهف: طريقة الخلايا (ثنائية البعد) ---------- */
+function analyze(){
+ MASK=null;TG=[];CID=null;DEV=null;GHM=$('ghost').value==='dim';
+ const dx=Math.max(.01,num($('dx'))||1),dy=Math.max(.01,num($('dy'))||1),fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,hiT=$('atype').value==='high'||$('metric').value==='x';
+ G3.dx=dx;G3.dy=dy;FR=fr;
+ if($('amode').value==='lines'){if(!analyzeLines(dx,dy,fr,kk,rr,ut,$('atype').value==='high')&&$('ghost').value==='hide')D=D.map(r=>r.map(()=>null));return}
+ const vs=[];D.forEach(r=>r.forEach(x=>x!==null&&vs.push(x)));vs.sort((a,b)=>a-b);
+ const n0=vs.length-1,bg=(vs[Math.floor(n0/2)]+vs[Math.ceil(n0/2)])/2;
+ const dev=D.map(r=>r.map(x=>x===null?null:(hiT?x-bg:bg-x)));let mx=0;dev.forEach(r=>r.forEach(x=>{if(x!==null&&x>mx)mx=x}));
+ if(vs.length<6||mx<=0){if($('ghost').value==='hide'&&vs.length>=6)D=D.map(r=>r.map(()=>null));return}
+ const mk=dev.map(r=>r.map(x=>x!==null&&x>=fr*mx)),seen=D.map(r=>r.map(()=>0)),comps=[];
+ for(let i=0;i<R;i++)for(let j=0;j<C;j++){if(!mk[i][j]||seen[i][j])continue;
+  const st=[[i,j]],cells=[];seen[i][j]=1;
+  while(st.length){const [a,b]=st.pop();cells.push([a,b]);for(let p=-1;p<=1;p++)for(let q=-1;q<=1;q++){const u=a+p,w=b+q;if(u>=0&&u<R&&w>=0&&w<C&&mk[u][w]&&!seen[u][w]){seen[u][w]=1;st.push([u,w])}}}
+  comps.push(cells)}
+ const all=comps.map(cl=>{
+  const n=cl.length;let mxm=0,mym=0,sw=0,wx=0,wy=0,pk=0,edge=false;
+  cl.forEach(([a,b])=>{mxm+=b*dx;mym+=a*dy;const w=dev[a][b];sw+=w;wx+=w*b;wy+=w*a;if(w>pk)pk=w;if(a===0||b===0||a===R-1||b===C-1)edge=true});
+  mxm/=n;mym/=n;let sxx=dx*dx/12,syy=dy*dy/12,sxy=0;
+  cl.forEach(([a,b])=>{const X=b*dx-mxm,Y=a*dy-mym;sxx+=X*X/n;syy+=Y*Y/n;sxy+=X*Y/n});
+  const tr=(sxx+syy)/2,df=Math.hypot((sxx-syy)/2,sxy),L=4*Math.sqrt(tr+df),W=4*Math.sqrt(Math.max(tr-df,1e-9));
+  const zc0=kk*W/2,h0=rr*W,roof=Math.max(0,zc0-h0/2),floor=zc0+h0/2,H=floor-roof;
+  return{L,W,roof,floor,H,zc:(roof+floor)/2,vol:Math.PI/6*L*W*H,cy:wy/sw,cx:wx/sw,eR:Math.hypot(ut*roof,.5*Math.max(dx,dy)),eF:Math.hypot(ut*floor,.5*Math.max(dx,dy)),pct:pk/Math.abs(bg||1)*100,sum:sw,edge,small:W<2*Math.max(dx,dy),cells:cl}
+ }).sort((a,b)=>b.sum-a.sum);
+ TG=all.filter(r=>r.sum>=.1*all[0].sum).slice(0,4);
+ MASK=D.map(r=>r.map(()=>false));CID=D.map(r=>r.map(()=>-1));
+ TG.forEach((r,k)=>r.cells.forEach(([a,b])=>{MASK[a][b]=true;CID[a][b]=k}));
+ DEV=dev.map(r=>r.map(x=>x===null?0:Math.max(0,x/mx)));
+ if($('ghost').value==='hide')D=D.map((r,i)=>r.map((x,j)=>MASK[i][j]?x:null))}
+
+function selT(i){sel=i;showTG();r3()}
+function noTGmsg(){
+ const base='لا يوجد هدف واضح. ';
+ if(!isComp())return base+'جرّب نوع الشذوذ أو العتبة من الإعدادات.';
+ const d=CDIAG,ty=$('atype').selectedOptions[0]?$('atype').selectedOptions[0].textContent:'';
+ if(!d.rings.length)return base+'لا توجد قمة ذات دلالة في أي دائرة. جرّب تبديل «نوع الشذوذ» (الحالي: '+ty+')، أو زِد عدد العيّنات.';
+ if(d.single)return base+'ظهرت قمة في الدائرة '+d.rings.join('، ')+' فقط. فعّل «اقبل قمة في دائرة واحدة».';
+ return base+'ظهرت قمم في الدوائر '+d.rings.join('، ')+' لكنها لم تُجمع كهفاً واحداً. خفّض «عتبة الحدود» من الإعدادات أو زِد العيّنات.'}
+function showTG(){
+ const el=$('tg');
+ if(!TG.length){el.innerHTML='<p class="hint">'+noTGmsg()+'</p>';return}
+ if(sel>=TG.length)sel=0;
+ const t=TG[sel],f=x=>x.toFixed(1),lowT=$('atype').value==='low',tyTxt=lowT?'ماء أو طين أو معدن (مقاومة أقل من الوسط) — القياس وحده لا يفرّق بينها':'فراغ أو كهف (مقاومة أعلى من الوسط)',reach=t.reachMax??((num($('ll'))||10)*(num($('al'))||.4));
+ el.innerHTML=`<div class="row" style="justify-content:flex-start;margin-bottom:5px">${TG.map((_,i)=>`<button class="chip${i===sel?' on':''}" onclick="selT(${i})">هدف ${i+1}</button>`).join('')}${t.edge?'<span class="w">⚠ يمتد خارج المسح</span>':''}${t.small?'<span class="w">⚠ قريب من دقة المسح</span>':''}${t.floor>reach?`<span class="w">⚠ القاع أعمق من مدى الاستقصاء (~${f(reach)} م)</span>`:''}${t.amb?'<span class="w">⚠ تقاطعات وهمية محتملة</span>':''}${(t.notes||[]).map(n=>`<span class="w">⚠ ${n}</span>`).join('')}${(t.zx&&t.zy&&Math.max(t.zx,t.zy)/Math.max(1e-6,Math.min(t.zx,t.zy))>1.6)?'<span class="w">⚠ تباين بين عمق H وV</span>':''}</div>
+ <p class="hint" style="margin:2px 0 6px;text-align:start">النوع المحتمل: ${tyTxt}</p>
+ <div class="g3"><div class="kv k"><span>عمق السقف</span><b>${f(t.roof)} ± ${f(t.eR)} م</b></div><div class="kv k"><span>عمق القاع</span><b>${f(t.floor)} ± ${f(t.eF)} م</b></div><div class="kv"><span>الارتفاع</span><b>${f(t.H)} م</b></div>
+ <div class="kv"><span>الطول × العرض</span><b>${f(t.L)} × ${f(t.W)} م</b></div><div class="kv"><span>الحجم التقريبي</span><b>${t.vol.toFixed(0)} م³</b></div>${t.compass?`<div class="kv"><span>الاتجاه · المسافة</span><b>${t.bear.toFixed(0)}° · ${f(t.dist)}±${f(t.dd)} م</b></div>`:`<div class="kv"><span>الموقع</span><b>س${f(t.cy+1)} · ع${f(t.cx+1)}</b></div>`}</div>`}
+
+/* ---------- المجسم ثلاثي الأبعاد ---------- */
+const BODY=()=>$('atype').value==='low'?{r:[96,165,250],f:[37,99,176]}:{r:[255,159,67],f:[196,104,48]};
+function build3(){
+ P3=null;if(!D)return;
+ const dx=G3.dx,dy=G3.dy,k=Math.max(1,Math.min(4,Math.ceil(36/Math.max(R,C)))),NX=(C-1)*k+1,NY=(R-1)*k+1,Wm=(C-1)*dx,Hm=(R-1)*dy,m=Math.max(Wm,Hm,1e-6),ex=dx/k,ey=dy/k,N=NX*NY;
+ const val=new Float32Array(N),ok=new Uint8Array(N),polys=[];
+ for(let a=0;a<NY;a++)for(let b=0;b<NX;b++){sam(D,(C-1)-b/k,a/k);const n=a*NX+b;val[n]=Math.max(0,Math.min(1,T(SV)));ok[n]=SW>.55?1:0}
+ const shd=(d1,d2)=>{const l=Math.hypot(d1/ex,d2/ey,1);return .55+.45*Math.min(1,Math.abs((d1/ex*.35+d2/ey*.45+.82)/l)*1.15)};
+ const Q=(n,a,b,zf,c,al)=>polys.push({p:[[b*ex,a*ey,zf(n)],[(b+1)*ex,a*ey,zf(n+1)],[(b+1)*ex,(a+1)*ey,zf(n+NX+1)],[b*ex,(a+1)*ey,zf(n+NX)]],c,a:al});
+ const each=f=>{for(let a=0;a<NY-1;a++)for(let b=0;b<NX-1;b++)f(a*NX+b,a,b)};
+ if(mode===2){
+  const span=.4*m,zf=n=>(val[n]-.5)*span;
+  each((n,a,b)=>{if(ok[n]&&ok[n+1]&&ok[n+NX]&&ok[n+NX+1])Q(n,a,b,zf,rgb(cm((val[n]+val[n+1]+val[n+NX]+val[n+NX+1])/4),shd(zf(n+1)-zf(n),zf(n+NX)-zf(n))),1)});
+  G3={dx,dy,Wm,Hm,z0:-span/2,z1:span/2};P3=polys;return}
+ let Dm=Math.max(.3*m,1);if(TG.length)Dm=Math.max(Dm,Math.max(...TG.map(t=>t.floor))*1.4);
+ /* الجدران والقاع (تربة شفافة) */
+ const W4=[[0,0],[Wm,0],[Wm,Hm],[0,Hm]],soil='#7a6650';
+ for(let i=0;i<4;i++){const p=W4[i],q=W4[(i+1)%4];polys.push({p:[[p[0],p[1],0],[q[0],q[1],0],[q[0],q[1],-Dm],[p[0],p[1],-Dm]],c:soil,a:.2})}
+ polys.push({p:W4.map(p=>[p[0],p[1],-Dm]),c:soil,a:.2});
+ /* سطح الأرض ملوّن بخريطة القيم */
+ each((n,a,b)=>{if(ok[n]&&ok[n+1]&&ok[n+NX]&&ok[n+NX+1])Q(n,a,b,()=>0,rgb(cm((val[n]+val[n+1]+val[n+NX]+val[n+NX+1])/4)),GHM&&MASK&&!MASK[Math.min(R-1,Math.max(0,Math.round((a+.5)/k)))][Math.min(C-1,Math.max(0,Math.round((C-1)-(b+.5)/k)))]?.1:.5)});
+ /* جسم الكهف: سقف وقاع بسماكة تتبع قوة الشذوذ */
+ if(TG.length){
+  const rf=new Float32Array(N),fl=new Float32Array(N),oc=new Uint8Array(N);
+  for(let a=0;a<NY;a++)for(let b=0;b<NX;b++){const gx=(C-1)-b/k,gy=a/k;sam(DEV,gx,gy);const s=SV,id=CID[Math.min(R-1,Math.max(0,Math.round(gy)))][Math.min(C-1,Math.max(0,Math.round(gx)))];
+   if(id>=0&&s>FR){const t=TG[id],tk=t.H*Math.sqrt((s-FR)/(1-FR+1e-9)),n=a*NX+b;rf[n]=t.zc-tk/2;fl[n]=t.zc+tk/2;oc[n]=1}}
+  each((n,a,b)=>{if(!(oc[n]&&oc[n+1]&&oc[n+NX]&&oc[n+NX+1]))return;
+   Q(n,a,b,i=>-fl[i],rgb(BODY().f,shd(fl[n+1]-fl[n],fl[n+NX]-fl[n])),.97);
+   Q(n,a,b,i=>-rf[i],rgb(BODY().r,shd(rf[n+1]-rf[n],rf[n+NX]-rf[n])),.97)})}
+ G3={dx,dy,Wm,Hm,z0:-Dm,z1:0};P3=polys}
+
+function r3(){
+ if(!P3||tab!==2)return;
+ const cv=$('c3'),dp=Math.min(2,window.devicePixelRatio||1),W=Math.round(cv.clientWidth*dp),H=Math.round(cv.clientHeight*dp);if(W<10||H<10)return;
+ cv.width=W;cv.height=H;const ctx=cv.getContext('2d'),vx=$('vx').value/10,{Wm,Hm,z0,z1}=G3;
+ const tt=(mode===1&&TG[sel])?TG[sel]:null,ox=tt?(tt.wx??(C-1-tt.cx)*G3.dx):Wm/2,oy=tt?(tt.wy??tt.cy*G3.dy):Hm/2,oz=tt?-(tt.zc??(tt.roof+tt.floor)/2)*vx:(z0+z1)/2*vx,rw=.5*Math.hypot(Wm,Hm,(z1-z0)*vx)||1,S=.46*Math.min(W,H)/rw*cam.z;
+ const cy=Math.cos(cam.yaw),sy=Math.sin(cam.yaw),cp=Math.cos(cam.p),sp=Math.sin(cam.p);
+ const pr=(x,y,z)=>{const X=x-ox,Y=y-oy,Z=z*vx-oz,x1=X*cy-Y*sy,y1=X*sy+Y*cy;return[W/2+x1*S,H/2-(Z*cp-y1*sp)*S,y1*cp+Z*sp]};
+ const items=P3.map(p=>{const q=p.p.map(v=>pr(v[0],v[1],v[2]));return{q,d:(q[0][2]+q[1][2]+q[2][2]+q[3][2])/4,c:p.c,a:p.a}}).sort((a,b)=>a.d-b.d);
+ for(const it of items){ctx.globalAlpha=it.a;ctx.fillStyle=it.c;ctx.strokeStyle=it.c;ctx.lineWidth=.7;ctx.beginPath();it.q.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill();ctx.stroke()}
+ ctx.globalAlpha=1;
+ if(mode!==1)return;
+ /* إطار كتلة الأرض */
+ const c4=[[0,0],[Wm,0],[Wm,Hm],[0,Hm]];ctx.strokeStyle='rgba(150,158,170,.75)';ctx.lineWidth=1.3*dp;
+ [z1,z0].forEach(z=>{ctx.beginPath();c4.forEach((p,i)=>{const q=pr(p[0],p[1],z);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])});ctx.closePath();ctx.stroke()});
+ c4.forEach(p=>{const a=pr(p[0],p[1],z1),b=pr(p[0],p[1],z0);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()});
+ /* خط القياس: السطح ← السقف ← القاع */
+ const t=TG[sel];if(!t)return;
+ const X=t.wx??(C-1-t.cx)*G3.dx,Y=t.wy??t.cy*G3.dy,A=pr(X,Y,0),B=pr(X,Y,-t.roof),F=pr(X,Y,-t.floor),fs=12*dp*TS3();
+ ctx.save();ctx.strokeStyle='#fff';ctx.fillStyle='#fff';ctx.lineWidth=1.8*dp;ctx.setLineDash([5*dp,4*dp]);ctx.shadowColor='#000';ctx.shadowBlur=4;
+ ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(F[0],F[1]);ctx.stroke();ctx.setLineDash([]);
+ [A,B,F].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],3.5*dp,0,7);ctx.fill()});
+ ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';
+ ctx.fillText('السقف '+t.roof.toFixed(1)+' ± '+t.eR.toFixed(1)+' م',B[0]+8*dp,B[1]+4*dp);ctx.fillText('القاع '+t.floor.toFixed(1)+' ± '+t.eF.toFixed(1)+' م',F[0]+8*dp,F[1]+4*dp);ctx.restore();dims3(ctx,pr,t,dp,Wm,X,Y)}
+/* أبعاد الكهف المتوقَّع فوق المجسم: العرض والارتفاع وحدود الخطأ والمسافة من محور الفرجار */
+function dims3(ctx,pr,t,dp,Wm,X,Y){
+ const f1=v=>v.toFixed(1),ra=Math.max(.3,t.W/2),zc=t.zc??(t.roof+t.floor)/2,fs=11.5*dp*TS3(),Y1='#ffd23f',CY='#7fe3ff';
+ const seg=(a,b,col,w,dash)=>{ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w*dp;ctx.setLineDash(dash?dash.map(v=>v*dp):[]);ctx.shadowBlur=0;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();ctx.restore()};
+ const tick=(p,col)=>{ctx.save();ctx.fillStyle=col;ctx.beginPath();ctx.arc(p[0],p[1],3*dp,0,Math.PI*2);ctx.fill();ctx.restore()};
+ /* العرض: خط أفقي عند مركز الكهف */
+ const w1=pr(X-ra,Y,-zc),w2=pr(X+ra,Y,-zc);seg(w1,w2,Y1,2);tick(w1,Y1);tick(w2,Y1);
+ pillTxt(ctx,'العرض '+f1(t.W)+' م',(w1[0]+w2[0])/2,(w1[1]+w2[1])/2-8*dp,fs,Y1);
+ /* الارتفاع: خط رأسي بين السقف والقاع على حافة الكهف */
+ const h1=pr(X-ra,Y,-t.roof),h2=pr(X-ra,Y,-t.floor);seg(h1,h2,Y1,2);tick(h1,Y1);tick(h2,Y1);
+ pillTxt(ctx,'الارتفاع '+f1(t.H)+' م',Math.min(h1[0],h2[0])-8*dp,(h1[1]+h2[1])/2+4*dp,fs,Y1,'right');
+ /* حدود الخطأ المتوقعة للسقف والقاع على خط العمق */
+ [[t.roof,t.eR],[t.floor,t.eF]].forEach(([z,e])=>{const a=pr(X,Y,-(z-e)),b=pr(X,Y,-(z+e));seg(a,b,CY,4)});
+ /* المسافة والاتجاه من محور الفرجار على سطح الأرض */
+ if(t.compass){const c0=pr(Wm/2,Wm/2,0),s1=pr(X,Y,0);seg(c0,s1,'#6ee7a0',2,[6,4]);tick(c0,'#6ee7a0');
+  pillTxt(ctx,'المسافة '+f1(t.dist)+(t.dd!=null?' ± '+f1(t.dd):'')+' م · الاتجاه '+t.bear.toFixed(0)+' درجة',(c0[0]+s1[0])/2,(c0[1]+s1[1])/2-8*dp,fs,'#6ee7a0')}
+ /* ملخص الأبعاد */
+ pillTxt(ctx,'العرض '+f1(t.W)+' × الارتفاع '+f1(t.H)+' م · الحجم ≈ '+t.vol.toFixed(0)+' م³',8*dp,ctx.canvas.height-10*dp,fs,'#fff','left')}
+function loop(){cancelAnimationFrame(raf);if(tab===2&&$('ar').checked){cam.yaw+=.008;r3();raf=requestAnimationFrame(loop)}}
+function applyTS(){$('p2').style.setProperty('--ts',($('ts').value/100).toFixed(2))}
+function setTS(){applyTS();try{localStorage.setItem('cave-ts',$('ts').value)}catch(e){}r3()}
+function reset3(){cam={yaw:.5,p:.55,z:3};r3()}
+(()=>{const c=$('c3'),P=new Map();
+ c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);c.style.cursor='grabbing'});
+ c.addEventListener('pointermove',e=>{const o=P.get(e.pointerId);if(!o)return;
+  if(P.size===1){cam.yaw+=(e.clientX-o[0])*.01;cam.p=Math.max(-1.5,Math.min(1.5,cam.p+(e.clientY-o[1])*.01))}
+  else if(P.size===2){const t=[...P].find(([id])=>id!==e.pointerId)[1],d0=Math.hypot(o[0]-t[0],o[1]-t[1])||1,d1=Math.hypot(e.clientX-t[0],e.clientY-t[1]);cam.z=Math.max(.4,Math.min(9,cam.z*d1/d0))}
+  P.set(e.pointerId,[e.clientX,e.clientY]);r3()});
+ const up=e=>{P.delete(e.pointerId);c.style.cursor='grab'};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+ c.addEventListener('wheel',e=>{e.preventDefault();cam.z=Math.max(.4,Math.min(9,cam.z*(e.deltaY<0?1.1:.9)));r3()},{passive:false});
+ window.addEventListener('resize',()=>r3())})();
+
+/* ---------- ملفات البحث والاتصال ---------- */
+/* ---------- نمط الفرجار: قطب ثابت في المركز وقطب متحرك على دوائر ---------- */
+const isComp=()=>$('smode').value==='compass';
+function cdims(){
+ const r0=Math.max(.5,num($('cr0'))||2),K=Math.max(1,Math.min(8,Math.round(num($('cnr'))||3)));
+ const raw=Number(String($('cns').value||'').replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c)).trim().split(/[\s,،;؛]+/)[0]);
+ const N=Math.max(3,Math.min(120,Math.round(raw>0?raw:12))),rad=[],cn=[];
+ for(let k=0;k<K;k++){rad.push(r0*(k+1));cn.push(N)}
+ return{rad,cn}}
+function buildCRows(){
+ const d=cdims();CRAD=d.rad;CN=d.cn;const el=$('cin');el.innerHTML='';
+ const box=document.createElement('div');box.className='cgrid';box.style.minWidth=Math.max(Math.max(...CN)*36,280)+'px';
+ const rl=document.createElement('div');rl.className='ruler';
+ [0,90,180,270].forEach(a=>{const t=document.createElement('span');t.textContent=a+'°';t.style.insetInlineStart=(a/360*100)+'%';rl.appendChild(t)});box.appendChild(rl);
+ CRAD.forEach((r,k)=>{
+  const row=document.createElement('div');row.className='rr';
+  const lb=document.createElement('b');lb.textContent='نق '+r.toFixed(1)+' م · '+CN[k]+' عيّنة';row.appendChild(lb);
+  const sc=document.createElement('div');sc.className='rs2';
+  for(let m=0;m<CN[k];m++){const w=document.createElement('div');w.className='cc';
+   const e=inp('g c','°'+Math.round(360*m/CN[k]),'c'+k+'_'+m);e.addEventListener('input',changed);
+   const n=document.createElement('span');n.className='nt';n.id='n'+k+'_'+m;w.appendChild(e);w.appendChild(n);sc.appendChild(w)}
+  row.appendChild(sc);box.appendChild(row)});
+ el.appendChild(box);cHintUpdate()}
+function buildC(){
+ const d=cdims();CRAD=d.rad;CN=d.cn;
+ if(($('cview')||{}).value==='rows'){buildCRows();return}
+ const el=$('cin');el.innerHTML='';const K=CRAD.length,N=CN[0],av=Math.max(280,Math.min((el.clientWidth||window.innerWidth-20)-6,760)),TAU=Math.PI*2;
+ let c=av>600?44:34,R0,out;
+ for(;c>=26;c-=2){R0=Math.max(N*(c+3)/TAU,c+8);out=K*R0+c/2+30;if(out*2<=av)break}
+ if(c<26)c=26;R0=Math.max(N*(c+3)/TAU,c+8);out=K*R0+c/2+24;
+ const D=Math.round(out*2),cx=D/2,cy=D/2,ccw=$('cdir').value==='ccw',sg=ccw?-1:1;
+ const box=document.createElement('div');box.className='cir';box.style.width=box.style.height=D+'px';
+ let svg='<svg width="'+D+'" height="'+D+'" viewBox="0 0 '+D+' '+D+'"><g fill="none" stroke="currentColor" stroke-opacity=".28">';
+ for(let k=0;k<K;k++)svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(R0*(k+1))+'"/>';
+ svg+='<line x1="'+cx+'" y1="10" x2="'+cx+'" y2="'+(D-10)+'"/><line x1="10" y1="'+cy+'" x2="'+(D-10)+'" y2="'+cy+'"/></g><circle cx="'+cx+'" cy="'+cy+'" r="3" fill="var(--acc)"/><g fill="var(--mut)" font-size="9" text-anchor="middle">';
+ [['0°',cx,10],[(ccw?270:90)+'°',D-15,cy+3],['180°',cx,D-2],[(ccw?90:270)+'°',15,cy+3]].forEach(a=>svg+='<text x="'+a[1]+'" y="'+a[2]+'">'+a[0]+'</text>');
+ for(let k=0;k<K;k++){const a=Math.PI/N*sg;svg+='<text x="'+(cx+R0*(k+1)*Math.sin(a))+'" y="'+(cy-R0*(k+1)*Math.cos(a)+3)+'" fill="var(--acc)" opacity=".85">'+CRAD[k].toFixed(CRAD[k]%1?1:0)+' م</text>'}
+ box.innerHTML=svg+'</g></svg>';
+ for(let k=0;k<K;k++)for(let m=0;m<N;m++){
+  const th=TAU*m/N*sg,x=cx+R0*(k+1)*Math.sin(th),y=cy-R0*(k+1)*Math.cos(th);
+  const e=inp('g c','°'+Math.round(360*m/N),'c'+k+'_'+m);e.addEventListener('input',changed);
+  e.style.cssText='left:'+(x-c/2).toFixed(1)+'px;top:'+(y-c/2+2).toFixed(1)+'px;width:'+c+'px;height:'+(c-4)+'px;font-size:'+Math.max(8,Math.round(c*.34))+'px';
+  e.title='نق '+CRAD[k].toFixed(1)+' م · '+Math.round(360*m/N)+'°';box.appendChild(e)}
+ el.appendChild(box);cHintUpdate()}
+/* تبديل طريقة العرض (دائرة/سطور) مع الاحتفاظ بالقراءات */
+function setCView(){const old=cvals();try{localStorage.setItem('cave-cview',$('cview').value)}catch(e){}buildC();fillC(old);if(CD)refresh(true)}
+function cvals(){return CRAD.map((_,k)=>Array.from({length:CN[k]},(__,m)=>{const e=$('c'+k+'_'+m);return e?e.value:''}))}
+function fillC(a){if(!Array.isArray(a))return;a.forEach((r,k)=>{if(!Array.isArray(r)||k>=CRAD.length)return;r.forEach((v,m)=>{const e=$('c'+k+'_'+m);if(e&&m<CN[k])e.value=v==null?'':String(v)})})}
+function hasAnyC(){for(let k=0;k<CRAD.length;k++)for(let m=0;m<CN[k];m++){const e=$('c'+k+'_'+m);if(e&&e.value.trim()!=='')return true}return false}
+let ASK=null;
+/* تأكيد بنقرتين داخل الصفحة: النقرة الأولى تعرض الرسالة، والثانية خلال 6 ثوانٍ تنفّذ */
+function ask2(key,msg){
+ if(ASK&&ASK.key===key&&Date.now()-ASK.t<6000){ASK=null;askReset();return true}
+ ASK={key,t:Date.now()};const h=$('cHint');h.style.display='';h.textContent='⚠ '+msg+' — اضغط الزر مرة أخرى للتأكيد';h.style.color='#ffb020';document.querySelectorAll('#cHead button').forEach(b=>{if(b.textContent.trim()==='تطبيق'&&key==='apply'){b.dataset.t=b.textContent;b.textContent='اضغط للتأكيد';b.style.background='#ffb020';b.style.color='#000'}});
+ setTimeout(()=>{if(ASK&&ASK.key===key){ASK=null;cHintUpdate();askReset()}},6000);return false}
+function askReset(){document.querySelectorAll('#cHead button').forEach(b=>{if(b.dataset.t){b.textContent=b.dataset.t;delete b.dataset.t;b.style.background='';b.style.color=''}})}
+function applyC(){
+ if(isConnected()&&!devApplying){alert('اقطع الاتصال أولاً');return}
+ const d=cdims();
+ if(JSON.stringify(d.rad)!==JSON.stringify(CRAD)||JSON.stringify(d.cn)!==JSON.stringify(CN)){if(hasAnyC()&&!ask2('apply','تغيير الدوائر/العيّنات سيمسح قراءات الفرجار الحالية'))return;buildC()}
+ CD=null;cHintUpdate();save()}
+function clearC(){
+ if(isConnected()&&!devApplying){alert('اقطع الاتصال أولاً');return}
+ if(hasAnyC()&&!ask2('clear','سيتم مسح قراءات الفرجار'))return;
+ document.querySelectorAll('#cin input').forEach(e=>e.value='');resetRxState();changed()}
+function cHintUpdate(){
+ $('cHint').style.color='';const d=cdims(),g=GTG&&GTG[0];
+ $('cHint').textContent='الدوائر: '+d.rad.map(r=>r.toFixed(1)).join('، ')+' م · العيّنات: '+d.cn.join('، ')+($('csub')&&$('csub').checked&&d.rad.length>1?' · الصافي = قراءة المدار − قراءة المدار الأول بنفس الاتجاه':'')+(g?' · هدف الشبكة 1 عند س'+(g.cy+1).toFixed(1)+' · ع'+(g.cx+1).toFixed(1)+' — ضع مركز الفرجار هناك':'')}
+function setSM(m){
+ if(m!=='grid'&&m!=='compass')m='grid';
+ $('smode').value=m;const c=m==='compass';
+ $('smg').classList.toggle('on',!c);$('smc').classList.toggle('on',c);
+ ['gHead','gHint'].forEach(i=>$(i).style.display=c?'none':'');['cHead','cHint'].forEach(i=>$(i).style.display=c?'':'none');
+ $('tin').style.display=c?'none':'';$('cin').style.display=c?'':'none';
+ D=null;CD=null;P3=null;TG=[];MASK=null;if(c)cHintUpdate();
+ save();setMV(mv);
+ if((tab===1||tab===2)&&!refresh(false))setTab(0)}
+let CRAW_RAW=null;
+/* صافي القراءة = قراءة المدار − قراءة المدار الأول بنفس الاتجاه (استيفاء دائري إن اختلف عدد العيّنات) */
+function netC(raw){
+ const b=raw[0],N0=b.length;
+ return raw.map((a,k)=>k===0?a:a.map((x,m)=>{if(x===null)return null;
+  const p=m/CN[k]*N0,i0=Math.floor(p+1e-9),t=p-i0,A=b[i0%N0],B=b[(i0+1)%N0];
+  const v=Math.abs(t)<1e-6?A:(A===null?B:(B===null?A:A+(B-A)*t));
+  return v===null?null:Math.round((x-v)*1e6)/1e6}))}
+function updNet(raw,net){
+ for(let k=0;k<CRAD.length;k++)for(let m=0;m<CN[k];m++){const n=$('n'+k+'_'+m),e=$('c'+k+'_'+m);
+  const t=(k===0||!net||net===raw||raw[k][m]===null)?'':(net[k][m]===null?'–':String(Math.round(net[k][m]*100)/100));
+  if(n)n.textContent=t;if(e&&!n)e.title='نق '+CRAD[k].toFixed(1)+' م · '+Math.round(360*m/CN[k])+'°'+(t?' · الصافي: '+t:'')}}
+function computeC(){
+ const raw=CRAD.map((r,k)=>Array.from({length:CN[k]},(_,m)=>num($('c'+k+'_'+m))));
+ if(!raw.some(a=>a.some(x=>x!==null))){CD=null;CRAW_RAW=null;updNet(null,null);return false}
+ const net=($('csub')&&$('csub').checked&&CRAD.length>1)?netC(raw):raw;
+ CRAW_RAW=raw;updNet(raw,net);CRAW=net;CD=net;return true}
+/* قمم دائرية لشذوذ كل دائرة (تلتف عند 360°) */
+function ringRuns(p,fr){
+ const N=p.s.length;let off=0;for(let i=1;i<N;i++)if(p.s[i]<p.s[off])off=i;
+ const rot=Array.from({length:N},(_,i)=>p.s[(i+off)%N]);
+ return lineRuns({s:rot,mx:p.mx},fr).filter(r=>(r.i1-r.i0+1)<.8*N).map(r=>({...r,cenDeg:(((r.cen+off)%N)+N)%N*360/N,wtD:r.wt*360/N,w5D:r.w5*360/N}))}
+let CDIAG={rings:[],runs:0,single:0,hiT:true};
+function analyzeC(){
+ TG=[];MASK=null;CID=null;DEV=null;
+ const hiT=$('atype').value==='high',fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,al=num($('al'))||.4,dir=$('cdir').value==='ccw'?-1:1;
+ const K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,as=num($('cas'))||1;
+ const prof=CRAW.map(a=>lineProfile(a,hiT));CDIAG={rings:prof.map((p,k)=>p?k+1:0).filter(Boolean),runs:0,single:0,hiT};
+ CNORM=CRAW.map((a,k)=>a.map((x,m)=>x===null?null:(prof[k]?prof[k].n[m]:0)));
+ lo=0;hi=1;UN='';
+ const ad=(a,b)=>Math.abs(((a-b+540)%360)-180),tracks=[];
+ prof.forEach((p,k)=>{if(!p)return;ringRuns(p,fr).forEach(r=>{CDIAG.runs++;
+  let best=null,bd=1e9;
+  tracks.forEach(t=>{const l=t.rings[t.rings.length-1];if(l.k<k-2||l.k===k)return;const d=ad(l.cen,r.cenDeg),tol=Math.max(12,(l.wtD+r.wtD)/2*.75);if(d<=tol&&d<bd){bd=d;best=t}});
+  const e={k,cen:r.cenDeg,wtD:r.wtD,w5D:r.w5D,pk:r.pk/p.mx,con:p.mx/Math.abs(p.bg||1)};
+  if(best)best.rings.push(e);else tracks.push({rings:[e]})})});
+ const med=a=>{a=[...a].sort((p,q)=>p-q);return a[Math.floor((a.length-1)/2)]},all=[];
+ tracks.forEach(t=>{
+  const kOn=t.rings[0].k;if(t.rings.length<2&&kOn!==K-1&&K>1&&!($('one')&&$('one').checked)){CDIAG.single++;return}
+  let sx=0,sy=0,sw=0;t.rings.forEach(e=>{const w=e.pk*e.con;sx+=w*Math.sin(e.cen*Math.PI/180);sy+=w*Math.cos(e.cen*Math.PI/180);sw+=w});
+  const bear=((Math.atan2(sx,sy)*180/Math.PI)+360)%360,wtD=med(t.rings.map(e=>e.wtD)),w5D=med(t.rings.map(e=>e.w5D));
+  const rOn=CRAD[kOn],rPrev=kOn>0?CRAD[kOn-1]:0,rho=(rOn+rPrev)/2,dd=(rOn-rPrev)/2;
+  const W=rho*wtD*Math.PI/180,W50=rho*w5D*Math.PI/180,zc0=kk*W50/2,h0=rr*W,roof=Math.max(0,zc0-h0/2),floor=zc0+h0/2,H=floor-roof,reachOn=al*rOn;
+  const bp=dir*bear*Math.PI/180,east=rho*Math.sin(bp),north=rho*Math.cos(bp),notes=['الطول على امتداد نصف القطر مفترض = العرض'];
+  if(K>1&&t.rings.length<2)notes.push(kOn===K-1?'ظهر عند الدائرة الأخيرة فقط':'ظهر في دائرة واحدة فقط (نق '+CRAD[kOn].toFixed(1)+' م) — ثقة أقل');
+  if(zc0>1.2*reachOn)notes.push('العمق المقدّر أكبر من مدى الاستقصاء عند أول دائرة');
+  all.push({L:W,W,roof,floor,H,zc:(roof+floor)/2,vol:Math.PI/6*W*W*H,cy:0,cx:0,bear,dist:rho,dd,east,north,wx:Rm+east,wy:Rm-north,
+   eR:Math.hypot(ut*roof,dd/rho*zc0),eF:Math.hypot(ut*floor,dd/rho*zc0),pct:t.rings[0].con*100,sum:sw,edge:false,small:W<2*as,notes,reachMax:al*CRAD[K-1],compass:true,cells:[]})});
+ all.sort((a,b)=>b.sum-a.sum);TG=all.slice(0,4)}
+/* قيمة الحقل القطبي عند نقطة (شرق، شمال) بالأمتار -> SV/SW ، وتعيد false خارج المدى */
+function cfield(east,north){
+ const K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,rho=Math.hypot(east,north);cfield.rho=rho;
+ if(rho>Rm){SW=0;SV=0;return false}
+ let th=(Math.atan2(east,north)*180/Math.PI+360)%360;if($('cdir').value==='ccw')th=(360-th)%360;
+ const u=K>1?(rho-CRAD[0])/stp:0,uc=Math.max(0,Math.min(K-1,u)),k0=Math.floor(uc),k1=Math.min(K-1,k0+1),fk=sm(uc-k0);let sw=0,sv=0;
+ for(const [k,wk] of [[k0,1-fk],[k1,fk]]){if(wk<=0)continue;const N=CN[k],f=th/360*N,m0=Math.floor(f)%N,m1=(m0+1)%N,fa=sm(f-Math.floor(f));
+  for(const [m,wa] of [[m0,1-fa],[m1,fa]]){const x=CNORM[k][m];if(x===null)continue;const w=wk*wa;sw+=w;sv+=w*x}}
+ SW=sw;SV=sw>0?sv/sw:0;return true}
+function drawC(){analyzeC();buildCTable();mapC();build3C();showTG();setMV(mv);if(tab===2)r3()}
+function infoC(k,m){const x=CRAW[k][m];$('info').textContent=`نق ${CRAD[k].toFixed(1)} م · ${(360*m/CN[k]).toFixed(0)}° : `+(x===null?'بلا قراءة':`${(CRAW_RAW&&CRAW_RAW[k][m]!==x)?CRAW_RAW[k][m]+' ← صافي '+x:x}  (شذوذ نسبي ${CNORM[k][m].toFixed(2)})`)}
+function buildCTable(){
+ const el=$('cres');el.innerHTML='';
+ CRAD.forEach((r,k)=>{const row=document.createElement('div');row.className='rr';const b=document.createElement('b');b.textContent='نق '+r.toFixed(1)+' م';row.appendChild(b);
+  const sc=document.createElement('div');sc.className='rs';
+  CRAW[k].forEach((x,m)=>{const e=document.createElement('span');e.className='rc c2';
+   if(x===null){e.textContent='–';e.style.color='var(--mut)'}
+   else{const c=cm(CNORM[k][m]);e.textContent=String(Math.round(x*100)/100);e.style.background=rgb(c);e.style.color=(.299*c[0]+.587*c[1]+.114*c[2])>150?'#000':'#fff';e.onclick=()=>infoC(k,m)}
+   sc.appendChild(e)});row.appendChild(sc);el.appendChild(row)});
+ $('lo').textContent='0';$('hi').textContent='1 (أقوى شذوذ)';
+ $('bar').style.background=`linear-gradient(to right,${Array.from({length:9},(_,i)=>rgb(cm(i/8))).join(',')})`}
+/* نص بخلفية داكنة شبه شفافة (لأرقام الأبعاد) */
+const TS3=()=>Math.max(.2,Math.min(1,(+(($('ts')||{}).value||33))/100));
+function pillTxt(ctx,txt,x,y,fs,col,al){
+ ctx.save();ctx.font='bold '+fs+'px sans-serif';ctx.textAlign=al||'center';ctx.textBaseline='alphabetic';ctx.shadowBlur=0;ctx.setLineDash([]);
+ const w=ctx.measureText(txt).width,pd=fs*.35,bx=al==='left'?x-pd:al==='right'?x-w-pd:x-w/2-pd;
+ ctx.fillStyle='rgba(0,0,0,.62)';ctx.fillRect(bx,y-fs,w+2*pd,fs+pd*1.3);ctx.fillStyle=col;ctx.fillText(txt,x,y);ctx.restore()}
+function mapC(){
+ const K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,S=560,ppm=(S/2-14)/Rm,rin=CRAD[0]-stp/2,TAU=Math.PI*2;
+ CS_S=S;const ctx=prepCanvas($('ccv'),S,S),L=colLUT();
+ const tc=tmpCanvas(S,S),tx=tc.getContext('2d'),img=tx.createImageData(S,S),d=img.data;
+ for(let py=0;py<S;py++)for(let px=0;px<S;px++){
+  if(!cfield((px+.5-S/2)/ppm,(S/2-py-.5)/ppm)||SW<=.02)continue;
+  const k=lutIdx(SV),o=(py*S+px)*4;d[o]=L[k];d[o+1]=L[k+1];d[o+2]=L[k+2];d[o+3]=Math.max(0,Math.min(1,(SW-.3)/.45))*255*(cfield.rho<rin?.35:1)}
+ tx.putImageData(img,0,0);
+ ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(tc,0,0,S,S);
+ ctx.save();ctx.strokeStyle='rgba(255,255,255,.5)';ctx.fillStyle='#fff';ctx.lineWidth=1.2;ctx.font='12px sans-serif';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;
+ const fr=r=>(Number.isInteger(r)?r.toFixed(0):r.toFixed(1))+' م';
+ CRAD.forEach(r=>{ctx.beginPath();ctx.arc(S/2,S/2,r*ppm,0,TAU);ctx.stroke();ctx.fillText(fr(r),S/2,S/2-r*ppm-4)});
+ ctx.beginPath();ctx.moveTo(S/2,S/2-Rm*ppm);ctx.lineTo(S/2,S/2+Rm*ppm);ctx.moveTo(S/2-Rm*ppm,S/2);ctx.lineTo(S/2+Rm*ppm,S/2);ctx.stroke();
+ const ccw=$('cdir').value==='ccw';[['0°',S/2,14],[ccw?'270°':'90°',S-18,S/2+4],['180°',S/2,S-4],[ccw?'90°':'270°',18,S/2+4]].forEach(([t,x,y])=>ctx.fillText(t,x,y));
+ TG.forEach((t,i)=>{const x=S/2+t.east*ppm,y=S/2-t.north*ppm;ctx.setLineDash([5,4]);ctx.strokeStyle='#fff';ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(x,y,Math.max(6,t.W/2*ppm),0,TAU);ctx.stroke();ctx.setLineDash([]);ctx.font='bold 14px sans-serif';ctx.fillText(String(i+1),x,y+5);
+  /* أرقام الأبعاد */
+  const rr=Math.max(6,t.W/2*ppm),fx=Math.max(46,Math.min(S-46,x)),f1=v=>v.toFixed(1);
+  ctx.save();ctx.strokeStyle='rgba(255,210,63,.9)';ctx.lineWidth=1.3;ctx.setLineDash([3,3]);ctx.shadowBlur=0;ctx.beginPath();ctx.moveTo(S/2,S/2);ctx.lineTo(x,y);ctx.stroke();ctx.restore();
+  pillTxt(ctx,'المسافة '+f1(t.dist)+' م',(S/2+x)/2,(S/2+y)/2-4,11,'#ffd23f');
+  const by=Math.min(S-30,y+rr+14);
+  pillTxt(ctx,'العرض '+f1(t.W)+' م · الارتفاع '+f1(t.H)+' م',fx,by,11,'#fff');
+  pillTxt(ctx,'العمق من '+f1(t.roof)+' إلى '+f1(t.floor)+' م',fx,by+17,11,'#7fe3ff')});
+ ctx.restore()}
+function pickC(ev){
+ if(!CRAW)return;const cv=$('ccv'),r=cv.getBoundingClientRect(),S=CS_S,K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,ppm=(S/2-14)/Rm;
+ const x=((ev.clientX-r.left)/r.width*S-S/2)/ppm,y=(S/2-(ev.clientY-r.top)/r.height*S)/ppm,rho=Math.hypot(x,y);
+ let k=0,bd=1e9;CRAD.forEach((q,i)=>{const dd=Math.abs(q-rho);if(dd<bd){bd=dd;k=i}});
+ let th=(Math.atan2(x,y)*180/Math.PI+360)%360;if($('cdir').value==='ccw')th=(360-th)%360;infoC(k,Math.round(th/360*CN[k])%CN[k])}
+$('ccv').addEventListener('pointermove',pickC);$('ccv').addEventListener('pointerdown',pickC);
+function build3C(){
+ P3=null;if(!CD)return;
+ const K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,Wm=2*Rm,N=Math.min(44,Math.max(20,Math.round(Wm*3))),NN=N+1,h=Wm/N,polys=[],soil='#7a6650';
+ const val=new Float32Array(NN*NN),ok=new Uint8Array(NN*NN),Q=(p,c,a)=>polys.push({p,c,a});
+ for(let a=0;a<NN;a++)for(let b=0;b<NN;b++){const n=a*NN+b;if(cfield(b*h-Rm,Rm-a*h)&&SW>.55){val[n]=Math.max(0,Math.min(1,SV));ok[n]=1}}
+ const quad=n=>ok[n]&&ok[n+1]&&ok[n+NN]&&ok[n+NN+1],avg=n=>(val[n]+val[n+1]+val[n+NN]+val[n+NN+1])/4;
+ if(mode===2){
+  const span=.4*Wm,z=i=>(val[i]-.5)*span;
+  for(let a=0;a<N;a++)for(let b=0;b<N;b++){const n=a*NN+b;if(quad(n))Q([[b*h,a*h,z(n)],[(b+1)*h,a*h,z(n+1)],[(b+1)*h,(a+1)*h,z(n+NN+1)],[b*h,(a+1)*h,z(n+NN)]],rgb(cm(avg(n))),1)}
+  G3={dx:1,dy:1,Wm,Hm:Wm,z0:-span/2,z1:span/2};P3=polys;return}
+ let Dm=Math.max(.3*Wm,1);if(TG.length)Dm=Math.max(Dm,Math.max(...TG.map(t=>t.floor))*1.4);
+ const W4=[[0,0],[Wm,0],[Wm,Wm],[0,Wm]];
+ for(let i=0;i<4;i++){const p=W4[i],q=W4[(i+1)%4];Q([[p[0],p[1],0],[q[0],q[1],0],[q[0],q[1],-Dm],[p[0],p[1],-Dm]],soil,.2)}
+ Q(W4.map(p=>[p[0],p[1],-Dm]),soil,.2);
+ for(let a=0;a<N;a++)for(let b=0;b<N;b++){const n=a*NN+b;if(quad(n))Q([[b*h,a*h,0],[(b+1)*h,a*h,0],[(b+1)*h,(a+1)*h,0],[b*h,(a+1)*h,0]],rgb(cm(avg(n))),.5)}
+ TG.forEach(t=>{
+  const ra=Math.max(.3,t.W/2),NR=6,NA=20,zr=f=>t.zc-t.H*Math.sqrt(Math.max(0,1-f*f))/2,zl=f=>t.zc+t.H*Math.sqrt(Math.max(0,1-f*f))/2;
+  const P=(f,ph,z)=>[t.wx+ra*f*Math.cos(ph),t.wy+ra*f*Math.sin(ph),-z];
+  for(let j=0;j<NR;j++){const f1=j/NR,f2=(j+1)/NR;for(let q=0;q<NA;q++){const p1=q/NA*2*Math.PI,p2=(q+1)/NA*2*Math.PI,pm=(p1+p2)/2;
+   const sh=zz=>{const g=(zz(f2)-zz(f1))/(ra*(f2-f1)),l=Math.hypot(g,1);return .55+.45*Math.min(1,Math.abs((g*(.35*Math.cos(pm)+.45*Math.sin(pm))+.82)/l)*1.15)};
+   Q([P(f1,p1,zr(f1)),P(f2,p1,zr(f2)),P(f2,p2,zr(f2)),P(f1,p2,zr(f1))],rgb(BODY().r,sh(zr)),.97);
+   Q([P(f1,p1,zl(f1)),P(f2,p1,zl(f2)),P(f2,p2,zl(f2)),P(f1,p2,zl(f1))],rgb(BODY().f,sh(zl)),.97)}}});
+ G3={dx:1,dy:1,Wm,Hm:Wm,z0:-Dm,z1:0};P3=polys}
+/* استقبال الدوائر من الـ ESP32: RING_BEGIN [رقم] ثم القيم بالترتيب ثم RING_DONE، أو R,دائرة,عيّنة,قيمة */
+function putRing(k,m,v){
+ const x=Number(norm(String(v)));
+ if(!Number.isInteger(k)||!Number.isInteger(m)||k<0||k>=CRAD.length||m<0||m>=CN[k]||!Number.isFinite(x)||String(v).trim()==='')return false;
+ const e=$('c'+k+'_'+m);if(!e)return false;e.value=String(x);changed();return true}
+function ringLine(line){
+ const c=line.trim().toUpperCase();
+ if(!isComp()){status('بدّل نمط المسح إلى «فرجار» أولاً');return}
+ const mm=c.match(/^RING_BEGIN[\s,:]*(\d+)?$/);
+ if(mm){ringK=mm[1]?Number(mm[1])-1:ringK+1;ringM=0;if(ringK<0||ringK>=CRAD.length){status('رقم دائرة خارج النطاق: '+(ringK+1));ringK=-1;return}status('دائرة '+(ringK+1)+' (نق '+CRAD[ringK].toFixed(1)+' م): 0/'+CN[ringK]);return}
+ if(/^RING_DONE/.test(c)){if(ringK>=0)status('✓ اكتملت الدائرة '+(ringK+1)+' ('+ringM+'/'+CN[ringK]+')'+(ringM!==CN[ringK]?' — العدد لا يطابق المتوقع':''));return}
+ const a=c.replace(/,/g,' ').split(/\s+/).filter(Boolean);
+ if(a.length>=4&&a[0]==='R'){status(putRing(Number(a[1])-1,Number(a[2])-1,a[3])?'استُقبلت: '+line:'تعذر تفسير: '+line);return}
+ if(ringK>=0&&a.length===1){
+  if(ringM>=CN[ringK]){status('تجاوز عدد عيّنات الدائرة '+(ringK+1));return}
+  if(putRing(ringK,ringM,a[0])){ringM++;status('دائرة '+(ringK+1)+': '+ringM+'/'+CN[ringK])}else status('تعذر تفسير: '+line);return}
+ status('قيمة خارج الدائرة الحالية: '+line)}
+
+let bleDevice=null,bleServer=null,bleCharacteristic=null,rxBuffer='',seqIndex=0,phaseMode='idle',ringK=-1,ringM=0;
+function inputTypeChanged(){
+ if(isConnected()){status('اقطع الاتصال أولاً قبل تغيير صيغة البيانات');return}
+ const fmt=$('dataFormat').value,seq=fmt!=='auto';$('seqOrderRow').style.display=(seq&&fmt!=='rowColPhases'&&fmt!=='rings')?'':'none';$('resetSeqBtn').style.display=seq?'':'none';
+ resetRxState();
+}
+
+$('dataFormat').addEventListener('change',()=>{resetRxState();inputTypeChanged()});
+$('seqOrder').addEventListener('change',()=>{seqIndex=0});
+function resetSequence(){resetRxState();status('أُعيد مؤشر التعبئة. في وضع ESP32 انتظر ROWS_BEGIN.');}
+function phaseCommand(line){
+ const cmd=line.trim().toUpperCase().replace(/[^A-Z_]/g,'');
+ if(cmd==='ROWS_BEGIN'){phaseMode='rows';seqIndex=0;status('مرحلة الصفوف (H): 0/'+(R*C));return true}
+ if(cmd==='ROWS_DONE'){phaseMode='rowsDone';seqIndex=0;status('انتهت مرحلة الصفوف (H). بانتظار COLS_BEGIN…');return true}
+ if(cmd==='COLS_BEGIN'){phaseMode='cols';seqIndex=0;status('مرحلة الأعمدة (V): 0/'+(R*C));return true}
+ if(cmd==='COLS_DONE'){phaseMode='done';status('✓ اكتملت دورة المسح: H و V');return true}
+ return false}
+function status(s){$('connStatus').textContent=s}
+function progressLabel(){
+ const total=R*C;
+ if(phaseMode==='rows')return 'مرحلة الصفوف (H): '+seqIndex+'/'+total;
+ if(phaseMode==='cols')return 'مرحلة الأعمدة (V): '+seqIndex+'/'+total;
+ if($('dataFormat').value==='seqH'||$('dataFormat').value==='seqV'||$('dataFormat').value==='seqPair')
+  return 'تعبئة متتابعة: '+seqIndex+'/'+total;
+ return null}
+/* ---------- قائمة الحفظ ---------- */
+const LIB='cave-lib-v1',SKEYS=['metric','cmap','clip','shw','ghost','dx','dy','atype','thr','kd','hr','ut','amode','ll','al','smode','cr0','crs','cnr','cas','cns','cdir','csub','one','arr','ea','ee','dataFormat','seqOrder'],CHK=['clip','shw','csub','one'];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function msg(s){$('saveMsg').textContent=s}
+function libGet(){try{const a=JSON.parse(localStorage.getItem(LIB)||'[]');return Array.isArray(a)?a.filter(e=>e&&Number.isInteger(e.R)&&Number.isInteger(e.C)&&Array.isArray(e.h)&&Array.isArray(e.v)):[]}catch(e){return[]}}
+function libSet(a){try{localStorage.setItem(LIB,JSON.stringify(a));return true}catch(e){msg('تعذر الحفظ: ذاكرة المتصفح ممتلئة أو ممنوعة. نزّل ملفاً أو انسخ JSON.');return false}}
+function resultSummary(){return((isComp()?CD:D)&&TG.length)?TG.map(t=>({bear:t.bear,dist:t.dist,row:t.cy+1,col:t.cx+1,L:t.L,W:t.W,H:t.H,roof:t.roof,floor:t.floor,eR:t.eR,eF:t.eF,vol:t.vol,edge:!!t.edge})):[]}
+function snapshot(){
+ if(hasAnyReading())refresh(false);
+ const g=k=>Array.from({length:R},(_,i)=>Array.from({length:C},(_,j)=>$(k+i+'_'+j).value)),st={};
+ SKEYS.forEach(k=>st[k]=CHK.includes(k)?$(k).checked:$(k).value);
+ return{format:'cave-survey',version:2,savedAt:new Date().toISOString(),name:($('surveyName').value||'').trim()||'مسح جديد',notes:$('surveyNotes').value,R,C,h:g('h'),v:g('v'),settings:st,compass:{rings:cvals()},result:resultSummary()}}
+function applySnapshot(d){
+ if(!d||(d.format&&d.format!=='cave-survey'))throw Error('ليس ملف مسح صالحاً');
+ if(!Number.isInteger(d.R)||!Number.isInteger(d.C)||d.R<2||d.R>40||d.C<2||d.C>40||!Array.isArray(d.h)||!Array.isArray(d.v))throw Error('بنية الملف غير صحيحة');
+ if(isConnected())throw Error('اقطع الاتصال بالجهاز أولاً');
+ if(hasAnyReading()&&!confirm('سيستبدل هذا المسح القراءات الحالية. هل تريد المتابعة؟'))return false;
+ R=d.R;C=d.C;D=null;$('rows').value=R;$('cols').value=C;resetRxState();build();
+ for(let i=0;i<R;i++)for(let j=0;j<C;j++){
+  const h=$('h'+i+'_'+j),v=$('v'+i+'_'+j);
+  h.value=(d.h[i]&&d.h[i][j]!=null)?String(d.h[i][j]):'';v.value=(d.v[i]&&d.v[i][j]!=null)?String(d.v[i][j]):'';
+  const off=h.value.trim()===''&&v.value.trim()==='',w=$('w'+i+'_'+j);w.classList.toggle('off',off);w.dataset.off=off?'1':''}
+ const q=d.settings||{};
+ SKEYS.forEach(k=>{if(q[k]===undefined)return;if(CHK.includes(k))$(k).checked=!!q[k];else $(k).value=q[k]});
+ $('thv').textContent=$('thr').value+'%';$('surveyName').value=d.name||'';$('surveyNotes').value=d.notes||'';
+ buildC();if(d.compass)fillC(d.compass.rings);setSM($('smode').value);arrUI();inputTypeChanged();changed();refresh(false);return true}
+function saveToLib(){
+ if(!hasAnyReading()){msg('لا توجد قراءات للحفظ.');return}
+ const s=snapshot(),a=libGet(),k=a.findIndex(x=>x.name===s.name);
+ if(k>=0){if(!confirm('يوجد مسح محفوظ بنفس الاسم. هل تريد استبداله؟'))return;a.splice(k,1)}
+ a.unshift(s);if(libSet(a)){$('surveyName').value=s.name;renderLib();msg('✓ تم الحفظ: '+s.name)}}
+function newSurvey(){
+ if(isConnected()){msg('اقطع الاتصال بالجهاز أولاً.');return}
+ if(hasAnyReading()&&!confirm('سيُمسح المسح الحالي (احفظه أولاً إن أردت). متابعة؟'))return;
+ document.querySelectorAll('#tin input').forEach(e=>e.value='');document.querySelectorAll('.hv').forEach(w=>{w.classList.remove('off');w.dataset.off=''});
+ $('surveyName').value='';$('surveyNotes').value='';D=null;resetRxState();changed();msg('مسح جديد جاهز.')}
+function libOpen(i){const e=libGet()[i];if(!e)return;try{if(applySnapshot(e))msg('✓ تم فتح: '+(e.name||''))}catch(x){msg('تعذر الفتح: '+x.message)}}
+function libDelete(i){const a=libGet(),e=a[i];if(!e||!confirm('حذف «'+(e.name||'')+'» نهائياً؟'))return;a.splice(i,1);if(libSet(a)){renderLib();msg('تم الحذف.')}}
+function libExport(i){const e=libGet()[i];if(e)download(e)}
+function exportFile(){download(snapshot())}
+function download(o){
+ try{const blob=new Blob([JSON.stringify(o,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=((o.name||'survey').replace(/[\\/:*?"<>|]/g,'_'))+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  msg('جُهّز الملف للتنزيل. إن لم يبدأ التنزيل استخدم «نسخ JSON».')}catch(e){msg('تعذر التنزيل: '+e.message+' — استخدم «نسخ JSON».')}}
+function copyText(t,okMsg){
+ $('jsonBox').value=t;
+ try{navigator.clipboard.writeText(t).then(()=>msg(okMsg),()=>msg('تعذر النسخ تلقائياً. النص ظاهر في الصندوق أدناه، حدّده وانسخه.'))}catch(e){msg('تعذر النسخ تلقائياً. النص ظاهر في الصندوق أدناه، حدّده وانسخه.')}}
+function copyJSON(){copyText(JSON.stringify(snapshot(),null,2),'✓ تم نسخ JSON.')}
+function importText(t){try{if(!String(t).trim())throw Error('لا يوجد نص');const d=JSON.parse(t);if(applySnapshot(d))msg('✓ تم الاستيراد: '+(d.name||''))}catch(e){msg('تعذر الاستيراد: '+e.message)}}
+function loadSurveyFile(file){if(!file)return;const fr=new FileReader();fr.onload=()=>importText(fr.result);fr.onerror=()=>msg('تعذر قراءة الملف');fr.readAsText(file)}
+function reportText(){
+ const s=snapshot(),f=x=>Number(x).toFixed(1),L=[];
+ L.push('تقرير مسح: '+s.name,'التاريخ: '+new Date().toLocaleString('ar'),(s.settings.smode==='compass'?`نمط الفرجار: أنصاف الأقطار ${CRAD.map(r=>r.toFixed(1)).join('، ')} م ، عيّنة كل ${s.settings.cas} م`:`الشبكة: ${R}×${C} ، التباعد: ${s.settings.dx}×${s.settings.dy} م`));
+ L.push('نوع الشذوذ: '+(s.settings.atype==='high'?'فراغ هوائي':'ماء/طين')+' ، القيمة: '+({m:'المحصلة',x:'تقاطع H×V',h:'H',v:'V'}[s.settings.metric]||s.settings.metric)+(s.settings.arr!=='raw'?' ، الأقطاب: '+$('arr').selectedOptions?.[0]?.text:''));
+ L.push('معايرة: k='+s.settings.kd+' ، ارتفاع/عرض='+s.settings.hr+' ، عدم اليقين='+s.settings.ut+'%'+' ، L='+s.settings.ll+' م ، α='+s.settings.al,'');
+ if(!s.result.length)L.push('لا يوجد هدف واضح.');
+ s.result.forEach((t,i)=>L.push(`الهدف ${i+1}: ${t.bear!==undefined?'الاتجاه '+f(t.bear)+'° والمسافة '+f(t.dist)+' م':'الموقع س'+f(t.row)+' ع'+f(t.col)} ، الأبعاد ${f(t.L)}×${f(t.W)} م ، الارتفاع ${f(t.H)} م`,`   السقف ${f(t.roof)} ± ${f(t.eR)} م ، القاع ${f(t.floor)} ± ${f(t.eF)} م ، الحجم ≈ ${t.vol.toFixed(0)} م³${t.edge?' (يمتد خارج المسح)':''}`));
+ if(s.notes)L.push('','ملاحظات: '+s.notes);
+ L.push('','* الأعماق تقديرية من قياس بمسافة أقطاب واحدة.');return L.join('\n')}
+function copyReport(){copyText(reportText(),'✓ تم نسخ التقرير.')}
+function renderLib(){
+ const el=$('lib');if(!el)return;const a=libGet();
+ if(!a.length){el.innerHTML='<p class="hint">لا توجد مسوح محفوظة بعد. اكتب اسماً واضغط «حفظ في القائمة».</p>';return}
+ el.innerHTML=a.map((e,i)=>{let n=0;try{for(let r=0;r<e.R;r++)for(let c=0;c<e.C;c++)if((e.h[r]&&e.h[r][c]!==''&&e.h[r][c]!=null)||(e.v[r]&&e.v[r][c]!==''&&e.v[r][c]!=null))n++}catch(x){}
+  const cc=(e.compass&&Array.isArray(e.compass.rings))?e.compass.rings.reduce((a,r)=>a+r.filter(x=>x!==''&&x!=null).length,0):0;
+  const t=(e.result&&e.result[0])?` · سقف ${Number(e.result[0].roof).toFixed(1)} م · قاع ${Number(e.result[0].floor).toFixed(1)} م`:'';
+  return`<div class="li"><b>${esc(e.name||'بلا اسم')}</b><small>${esc(new Date(e.savedAt).toLocaleString('ar'))} · ${(e.settings&&e.settings.smode==='compass')?'فرجار · '+cc+' عيّنة':e.R+'×'+e.C+' · '+n+' خلية'}${t}</small>${e.notes?`<small style="display:block">${esc(String(e.notes).slice(0,80))}</small>`:''}<div class="row" style="justify-content:flex-start;margin-top:6px"><button class="chip" onclick="libOpen(${i})">فتح</button><button class="chip" onclick="libExport(${i})">تنزيل</button><button class="chip" onclick="libDelete(${i})">حذف</button></div></div>`}).join('')}
+function placeReading(kind,row,col,value){const i=Number(row)-1,j=Number(col)-1,x=Number(norm(String(value)));if(!Number.isInteger(i)||!Number.isInteger(j)||i<0||i>=R||j<0||j>=C||!Number.isFinite(x))return false;const el=$(kind.toLowerCase()+i+'_'+j);if(!el)return false;el.value=String(x);const w=$('w'+i+'_'+j);w.classList.remove('off');w.dataset.off='';changed();return true}
+function placeSequential(kind,value){
+ const total=R*C;
+ if(seqIndex>=total){status('اكتملت تعبئة الشبكة؛ أوقف الإرسال أو اضغط «إعادة مؤشر التعبئة».');return false}
+ let i,j;
+ if($('seqOrder').value==='col'){j=Math.floor(seqIndex/R);i=seqIndex%R}
+ else{i=Math.floor(seqIndex/C);j=seqIndex%C}
+ const ok=placeReading(kind,i+1,j+1,value);
+ if(ok){seqIndex++;if(seqIndex>=total)status('✓ اكتملت تعبئة الشبكة ('+total+' قراءة)')}
+ return ok}
+function placeSequentialPair(h,v){
+ const total=R*C;
+ if(seqIndex>=total){status('اكتملت تعبئة الشبكة؛ أوقف الإرسال أو اضغط «إعادة مؤشر التعبئة».');return false}
+ let i,j;
+ if($('seqOrder').value==='col'){j=Math.floor(seqIndex/R);i=seqIndex%R}
+ else{i=Math.floor(seqIndex/C);j=seqIndex%C}
+ const a=placeReading('H',i+1,j+1,h),b=placeReading('V',i+1,j+1,v);
+ if(a||b){seqIndex++;if(seqIndex>=total)status('✓ اكتملت تعبئة الشبكة ('+total+' قراءة)')}
+ return a||b}
+/* ---------- تحكم الجهاز (ESP32) بالتطبيق: أسطر CFG|مفتاح|قيمة و CMD|أمر|قيمة ---------- */
+const DEV_CFG={ROWS:'rows',COLS:'cols',DX:'dx',DY:'dy',R0:'cr0',RINGS:'cnr',SAMPLES:'cns',ARC:'cas',DIR:'cdir',ATYPE:'atype',THR:'thr',K:'kd',HR:'hr',AL:'al',UT:'ut'};
+const DEV_CHK={SUB:'csub',ONE:'one'};
+function devSilent(fn){const oc=window.confirm,oa=window.alert;window.confirm=()=>true;window.alert=m=>status('الجهاز: '+m);const rb=rxBuffer;devApplying=true;try{fn()}finally{devApplying=false;rxBuffer=rb;window.confirm=oc;window.alert=oa}}
+function devCommand(kind,key,val){
+ try{
+  if(kind==='CFG'){
+   if(key==='MODE'){setSM(/^compass$/i.test(val)?'compass':'grid');status('الجهاز: وضع '+(/^compass$/i.test(val)?'الفرجار':'الشبكة'));return}
+   if(DEV_CHK[key]){const e=$(DEV_CHK[key]);if(!e)return;e.checked=(val==='1'||/^(on|true)$/i.test(val));e.dispatchEvent(new Event('change',{bubbles:true}));status('الجهاز: '+key+'='+val);return}
+   const id=DEV_CFG[key];const e=id&&$(id);if(!e){status('إعداد غير معروف من الجهاز: '+key);return}
+   if(e.tagName==='SELECT'){const ok=[...e.options].some(o=>o.value===val.toLowerCase());if(!ok){status('قيمة غير صالحة من الجهاز: '+key+'='+val);return}e.value=val.toLowerCase();e.dispatchEvent(new Event('change',{bubbles:true}))}
+   else{e.value=val;e.dispatchEvent(new Event('input',{bubbles:true}))}
+   status('الجهاز: '+key+'='+val);return}
+  if(kind==='CMD'){
+   const p=val.split('|'),a=p[0];
+   if(key==='APPLY'){devSilent(()=>{if($('smode').value==='compass'){ASK={key:'apply',t:Date.now()};applyC()}else applyDims()});status('الجهاز: تم تطبيق الإعدادات');return}
+   if(key==='PROCESS'){devSilent(()=>run());return}
+   if(key==='TAB'){devSilent(()=>setTab(+a||0));return}
+   if(key==='VIEW'){devSilent(()=>setMV(a==='map'?'map':'num'));return}
+   if(key==='CLEAR'){devSilent(()=>{if($('smode').value==='compass'){ASK={key:'clear',t:Date.now()};clearC()}else clearAll()});status('الجهاز: مسح القراءات');return}
+   status('أمر غير معروف من الجهاز: '+key)}
+ }catch(err){status('خطأ في أمر الجهاز: '+(err&&err.message||err))}}
+function consumeLine(line){
+ line=String(line).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫]/g,'.').replace(/[−–]/g,'-').replace(/[;\t]/g,',').trim();
+ if(!line)return;
+ const stm=line.match(/^STATUS\s*[|,:]\s*(.*)$/i);
+ if(stm){const nm={ERROR_TIMEOUT:'انتهت مهلة القياس — مقاومة عالية جداً أو قطب غير متصل',BLE_CONNECTED:'الجهاز متصل',READY:'الجهاز جاهز'}[stm[1].trim().toUpperCase()];status(nm||('الجهاز: '+stm[1]));return}
+ const dv=line.match(/^(CFG|CMD)\s*\|\s*([A-Za-z0-9_]+)\s*(?:\|\s*(.*))?$/i);
+ if(dv){devCommand(dv[1].toUpperCase(),dv[2].toUpperCase(),(dv[3]||'').trim());return}
+ const fmt=$('dataFormat').value;let ok=false;
+ if(fmt==='rings'){ringLine(line);return}
+ if(fmt==='rowColPhases'){
+  if(phaseCommand(line))return;
+  if(phaseMode!=='rows'&&phaseMode!=='cols'){status('قيمة خارج المرحلة الحالية: '+line);return}
+  const x=line.replace(/,/g,'.').trim();
+  if(x!==''&&Number.isFinite(Number(x))){
+   const total=R*C;
+   if(seqIndex>=total){status('تجاوز عدد القراءات المتوقع في المرحلة الحالية.');return}
+   let i,j;
+   if(phaseMode==='rows'){i=Math.floor(seqIndex/C);j=seqIndex%C;ok=placeReading('H',i+1,j+1,x)}
+   else{j=Math.floor(seqIndex/R);i=seqIndex%R;ok=placeReading('V',i+1,j+1,x)}
+   if(ok){seqIndex++;status(progressLabel())}
+  }
+ }
+ else if(fmt==='seqH'||fmt==='seqV'){
+  const x=line.replace(/,/g,'.').trim();
+  if(x!==''&&Number.isFinite(Number(x)))ok=placeSequential(fmt==='seqH'?'H':'V',x);
+  if(ok)status(progressLabel()||('استُقبلت: '+line));
+ }
+ else if(fmt==='seqPair'){
+  const a=line.split(/[ ,]+/).filter(Boolean);
+  if(a.length>=2)ok=placeSequentialPair(a[0],a[1]);
+  if(ok)status(progressLabel()||('استُقبلت زوج: '+line));
+ }
+ else{
+  const a=line.split(/[ ,]+/).filter(Boolean);
+  if(a.length>=4&&/^[HV]$/i.test(a[0]))ok=placeReading(a[0],a[1],a[2],a[3]);
+  else if(a.length>=4&&/^\d+$/.test(a[0])&&/^\d+$/.test(a[1])){
+   ok=placeReading('H',a[0],a[1],a[2]);
+   if(a[3]!==''&&a[3]!==undefined)ok=placeReading('V',a[0],a[1],a[3])||ok;
+  }
+  if(ok)status('استُقبلت: '+line);
+  else status('تعذر تفسير: '+line);
+ }
+}
+let rxBytes=0,rxLogA=[];
+function logRx(l){rxLogA.push(l);if(rxLogA.length>14)rxLogA.shift();const e=$('rxLog');if(e){e.textContent=rxLogA.join('\n');e.scrollTop=e.scrollHeight}}
+function feedData(chunk){rxBytes+=chunk.length;const c=$('rxCnt');if(c)c.textContent='الوارد من الجهاز: '+rxBytes+' بايت';rxBuffer+=chunk;let lines=rxBuffer.split(/\r?\n/);rxBuffer=lines.pop().slice(-500);lines.forEach(l=>{logRx(l);consumeLine(l)})}
+function setConnectedUI(on){
+ const pb=$('pairBar');if(pb)pb.style.display=on||!navigator.bluetooth?'none':(bleDevice?'none':'');
+ $('connectBtn').style.display=on?'none':'';
+ $('disconnectBtn').style.display=on?'':'none';
+}
+const BLE_SVC='6e400001-b5a3-f393-e0a9-e50e24dcca9e',BLE_RX='6e400003-b5a3-f393-e0a9-e50e24dcca9e',BLE_TX='6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+let bleWanted=false,bleBusy=false,bleRetry=0,bleTimer=null;
+function onBleDrop(){
+ bleCharacteristic=null;bleTx=null;releaseWake();resetRxState();setConnectedUI(false);
+ if(bleWanted){status('انقطع الاتصال — إعادة الاتصال تلقائياً…');scheduleReconnect()}else status('تم قطع الاتصال')}
+function scheduleReconnect(){
+ clearTimeout(bleTimer);const d=Math.min(1000*(bleRetry+1),5000);bleRetry++;
+ bleTimer=setTimeout(bleReconnect,d)}
+async function bleSetup(dev){
+ bleDevice=dev;
+ if(!dev._cvHook){dev._cvHook=1;dev.addEventListener('gattserverdisconnected',onBleDrop)}
+ status('جارٍ الاتصال بـ '+(dev.name||'الجهاز')+'…');
+ bleServer=await dev.gatt.connect();
+ const svc=await bleServer.getPrimaryService(BLE_SVC);
+ const ch=await svc.getCharacteristic(BLE_RX);
+ try{bleTx=await svc.getCharacteristic(BLE_TX)}catch(e){bleTx=null}
+ await ch.startNotifications();
+ ch.addEventListener('characteristicvaluechanged',e=>feedData(new TextDecoder().decode(e.target.value)));
+ bleCharacteristic=ch;bleRetry=0;resetRxState();
+ try{localStorage.setItem('cave-ble','1')}catch(e){}
+ setConnectedUI(true);takeWake();
+ status('متصل: '+(dev.name||'الجهاز')+' — بانتظار الإعدادات والقراءات…')}
+async function bleReconnect(){
+ if(!bleWanted||!bleDevice||bleBusy||isConnected())return;
+ bleBusy=true;
+ try{await bleSetup(bleDevice)}
+ catch(e){status('تعذّر الاتصال ('+(e&&e.message||e)+') — إعادة المحاولة…');try{bleDevice.gatt.disconnect()}catch(_){}bleCharacteristic=null;if(bleWanted)scheduleReconnect()}
+ finally{bleBusy=false}}
+
+/* ---------- تحسينات v15 ---------- */
+let bleTx=null,wl=null,HIST=[];
+async function takeWake(){try{if('wakeLock' in navigator&&!wl){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}}catch(e){}}
+function releaseWake(){try{wl&&wl.release()}catch(e){}wl=null}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&isConnected())takeWake()});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function sendCmd(t){
+ if(!bleTx||!isConnected()){status('غير متصل بالجهاز');return false}
+ try{await bleTx.writeValueWithoutResponse(new TextEncoder().encode(t+'\n'));status('أُرسل للجهاز: '+t);return true}
+ catch(e){status('تعذر الإرسال: '+(e&&e.message||e));return false}}
+async function sendDims(){
+ if(isComp()){const n=parseInt($('cnr').value)||0,m=parseInt($('cns').value)||0;if(n<1||m<1){status('قيم الفرجار غير صالحة');return}
+  if(await sendCmd('SET_MODE|COMPASS')){await sleep(250);await sendCmd('CONFIG|COMPASS|'+n+'|'+m)}}
+ else{const r=parseInt($('rows').value)||0,c=parseInt($('cols').value)||0;if(r<2||c<2){status('أبعاد الشبكة غير صالحة');return}
+  if(await sendCmd('SET_MODE|GRID')){await sleep(250);await sendCmd('CONFIG|GRID|'+r+'|'+c)}}}
+const _pr=placeReading;
+placeReading=function(k,r,c,v){const el=$(String(k).toLowerCase()+(Number(r)-1)+'_'+(Number(c)-1));const prev=el?el.value:null;const ok=_pr(k,r,c,v);if(ok&&el){HIST.push([el,prev]);if(HIST.length>300)HIST.shift()}return ok};
+function undoLast(){const h=HIST.pop();if(!h){status('لا توجد قراءة للتراجع (التراجع لقراءات الشبكة)');return}h[0].value=h[1];if($('dataFormat').value!=='auto'&&seqIndex>0)seqIndex--;changed();status('تم التراجع عن آخر قراءة')}
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
+function metaGet(){return{site:$('mSite').value,notes:$('mNotes').value,gps:$('mGps').dataset.v||''}}
+function metaSave(){try{localStorage.setItem('cave-meta',JSON.stringify(metaGet()))}catch(e){}}
+function metaLoad(){try{const m=JSON.parse(localStorage.getItem('cave-meta')||'{}');$('mSite').value=m.site||'';$('mNotes').value=m.notes||'';if(m.gps){$('mGps').dataset.v=m.gps;$('mGps').textContent='📍 '+m.gps}}catch(e){}}
+function getGps(){if(!navigator.geolocation){status('GPS غير متاح');return}
+ $('mGps').textContent='جارٍ تحديد الموقع…';
+ navigator.geolocation.getCurrentPosition(p=>{const v=p.coords.latitude.toFixed(6)+', '+p.coords.longitude.toFixed(6)+' (±'+Math.round(p.coords.accuracy)+' م)';$('mGps').dataset.v=v;$('mGps').textContent='📍 '+v;metaSave()},e=>{$('mGps').textContent='تعذر تحديد الموقع: '+e.message},{enableHighAccuracy:true,timeout:20000})}
+function exportJSON(){save();metaSave();const o={app:'cave-survey',ver:1,date:new Date().toISOString(),meta:metaGet(),data:localStorage.getItem(KEY),lib:localStorage.getItem(LIB)};
+ dl('cave_'+((o.meta.site||'survey').replace(/[^\w\u0600-\u06FF]+/g,'_'))+'_'+o.date.slice(0,10)+'.json',JSON.stringify(o),'application/json');status('تم تصدير النسخة')}
+function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const o=JSON.parse(r.result);if(o.app!=='cave-survey'||!o.data)throw Error('ملف غير صالح');localStorage.setItem(KEY,o.data);if(o.lib)localStorage.setItem(LIB,o.lib);localStorage.setItem('cave-meta',JSON.stringify(o.meta||{}));location.reload()}catch(e){status('فشل الاستيراد: '+e.message)}};r.readAsText(f)}
+function exportCSV(){const c=isComp();if(c?!CRAW:!D){status('لا توجد نتائج محسوبة بعد');return}
+ const t=c?(CRAW_RAW||CRAW).map((r,k)=>CRAD[k].toFixed(2)+','+r.map(x=>x===null?'':x).join(',')).join('\n'):D.map(r=>r.map(x=>x===null?'':x.toFixed(3)).join(',')).join('\n');
+ dl('cave_results.csv','\ufeff'+t,'text/csv')}
+window.addEventListener('load',()=>{metaLoad();if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{})});
+/* اقتران أول مرة: يحتاج لمسة من المستخدم (قيد المتصفح) */
+async function connectInput(){
+ if(!navigator.bluetooth){status('Web Bluetooth غير متاح: استخدم Chrome أو Edge وصفحة HTTPS (لا يعمل على Safari/iPhone).');return}
+ if(isConnected()||bleBusy)return;
+ bleWanted=true;
+ if(bleDevice&&!isConnected()){bleReconnect();return}
+ bleBusy=true;
+ try{
+  const dev=await navigator.bluetooth.requestDevice({filters:[{services:[BLE_SVC]}],optionalServices:[BLE_SVC]});
+  await bleSetup(dev)
+ }catch(e){
+  if(e&&e.name==='NotFoundError'){bleWanted=false;status('لم يتم اختيار جهاز. اضغط شريط الاقتران للمحاولة مجدداً.');const pb=$('pairBar');if(pb)pb.style.display=''}
+  else{status('تعذر الاتصال: '+(e&&e.message||e));if(bleDevice){try{bleDevice.gatt.disconnect()}catch(_){}scheduleReconnect()}}
+ }finally{bleBusy=false}}
+async function disconnectInput(){
+ bleWanted=false;clearTimeout(bleTimer);
+ try{if(bleDevice&&bleDevice.gatt&&bleDevice.gatt.connected)bleDevice.gatt.disconnect()}catch(e){}
+ bleCharacteristic=null;resetRxState();setConnectedUI(false);status('تم قطع الاتصال')}
+/* اتصال تلقائي عند فتح التطبيق */
+async function autoConnect(){
+ if(!navigator.bluetooth){status('Web Bluetooth غير متاح: استخدم Chrome أو Edge على أندرويد/حاسوب، وصفحة HTTPS.');return}
+ try{
+  if(navigator.bluetooth.getDevices){
+   const devs=await navigator.bluetooth.getDevices();
+   const d=devs.find(x=>/cave/i.test(x.name||''))||devs[0];
+   if(d){bleWanted=true;bleDevice=d;status('جارٍ البحث عن الجهاز المقترن…');bleReconnect();return}
+  }
+ }catch(e){}
+ status('اضغط في أي مكان للاقتران بالجهاز Murad-Cave-Scanner');
+ const pb=$('pairBar');if(pb)pb.style.display='';
+ document.addEventListener('click',function f(ev){document.removeEventListener('click',f,true);if(ev.target&&ev.target.id==='disconnectBtn')return;connectInput()},true)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&bleWanted&&!isConnected()&&!bleBusy){bleRetry=0;bleReconnect()}});
+window.addEventListener('load',()=>setTimeout(autoConnect,400));
+
+/* ---------- حفظ واستعادة ---------- */
+
+function copyCSV(){if(isComp()?!CRAW:!D)return;const t=isComp()?(CRAW_RAW||CRAW).map((r,k)=>CRAD[k].toFixed(2)+','+r.map(x=>x===null?'':x).join(',')).join('\n'):D.map(r=>r.map(x=>x===null?'':x.toFixed(3)).join(',')).join('\n');
+ const say=s=>$('cp').textContent=s;try{navigator.clipboard.writeText(t).then(()=>say('تم النسخ'),()=>say('تعذر النسخ في هذا المتصفح'))}catch(e){say('تعذر النسخ في هذا المتصفح')}}
+function save(){try{const g=k=>Array.from({length:R},(_,i)=>Array.from({length:C},(_,j)=>$(k+i+'_'+j).value));
+ localStorage.setItem(KEY,JSON.stringify({R,C,h:g('h'),v:g('v'),m:$('metric').value,c:$('cmap').value,p:$('clip').checked,q:SET.map(k=>$(k).value),o:$('shw').checked,g:$('ghost').value,cp:cvals()}))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s)return;
+ R=s.R;C=s.C;$('rows').value=R;$('cols').value=C;build();
+ for(let i=0;i<R;i++)for(let j=0;j<C;j++){const h=$('h'+i+'_'+j),v=$('v'+i+'_'+j);h.value=s.h[i][j];v.value=s.v[i][j];
+  if(h.value===''&&v.value===''){const w=$('w'+i+'_'+j);w.classList.add('off');w.dataset.off=1}}
+ $('metric').value=s.m||'m';if(!$('metric').value)$('metric').value='m';$('cmap').value=s.c;$('clip').checked=!!s.p;
+ if(s.q){SET.forEach((k,n)=>{if(s.q[n]!==undefined)$(k).value=s.q[n]});$('thv').textContent=$('thr').value+'%';$('shw').checked=s.o!==false}$('ghost').value=s.g||'off';buildC();if(s.cp)fillC(s.cp);setSM($('smode').value);return true}catch(e){}}
+try{$('csub').checked=localStorage.getItem('cave-csub')!=='0'}catch(e){}try{$('one').checked=localStorage.getItem('cave-one')!=='0'}catch(e){}try{const v=localStorage.getItem('cave-ts');if(v)$('ts').value=v}catch(e){}applyTS();try{const w=localStorage.getItem('cave-cview');if(w)$('cview').value=w}catch(e){}if(!load())build();if(!CRAD.length)buildC();setSM($('smode').value);arrUI();inputTypeChanged();renderLib();
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
