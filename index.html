@@ -954,6 +954,7 @@ function consumeLine(line){
  if(stm){const nm={ERROR_TIMEOUT:'انتهت مهلة القياس — مقاومة عالية جداً أو قطب غير متصل',BLE_CONNECTED:'الجهاز متصل',READY:'الجهاز جاهز'}[stm[1].trim().toUpperCase()];status(nm||('الجهاز: '+stm[1]));return}
  const dv=line.match(/^(CFG|CMD)\s*\|\s*([A-Za-z0-9_]+)\s*(?:\|\s*(.*))?$/i);
  if(dv){devCommand(dv[1].toUpperCase(),dv[2].toUpperCase(),(dv[3]||'').trim());return}
+ if(/^(R[\s,]|RING_BEGIN|RING_DONE)/i.test(line)){ringLine(line);return}
  const fmt=$('dataFormat').value;let ok=false;
  if(fmt==='rings'){ringLine(line);return}
  if(fmt==='rowColPhases'){
