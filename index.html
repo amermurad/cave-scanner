@@ -176,7 +176,7 @@ textarea{resize:vertical}
     <h3>تحديد الكهف</h3>
     <div class="sg">
       <label class="w2">طريقة التحليل <select id="amode" onchange="changed()"><option value="lines">خطوط متقاطعة (طريقتنا)</option><option value="cells">خلايا ثنائية البعد</option></select></label>
-      <label class="w2">نوع الشذوذ <select id="atype" onchange="changed()"><option value="high">فراغ هوائي (مقاومة أعلى)</option><option value="low">ماء أو طين أو معدن (مقاومة أقل)</option></select></label>
+      <label class="w2">نوع الشذوذ <select id="atype" onchange="changed()"><option value="high">فراغ هوائي (مقاومة أعلى)</option><option value="low">ماء أو طين أو معدن (مقاومة أقل)</option><option value="all">🔍 بحث شامل (تلقائي: كهف / معدن / تربة)</option></select></label>
       <label>بين الأعمدة (م) <input class="num" id="dx" type="text" inputmode="decimal" value="1" oninput="changed()"></label>
       <label>بين الأسطر (م) <input class="num" id="dy" type="text" inputmode="decimal" value="1" oninput="changed()"></label>
       <label class="w2">عتبة الحدود: <span id="thv">50%</span><input type="range" id="thr" min="20" max="80" value="50" oninput="$('thv').textContent=this.value+'%';changed()"></label>
@@ -192,6 +192,19 @@ textarea{resize:vertical}
     <h3>الفرجار</h3>
     <div class="sg"><label class="w2">اتجاه الزاوية (الصفر نحو الأعلى) <select id="cdir" onchange="changed()"><option value="cw">مع عقارب الساعة</option><option value="ccw">عكس عقارب الساعة</option></select></label></div>
     <p class="hint" style="text-align:start;margin-top:6px">عتبة الحدود وk والنسبة وα وهامش عدم اليقين تُستخدم في النمطين. أنصاف أقطار الدوائر وطول القوس تُضبط من تبويب القراءات في نمط الفرجار.</p>
+    <h3>🧠 الذكاء الاصطناعي المحلي (تدريب بالمستخدم)</h3>
+    <div class="sg">
+      <button class="w2" onclick="aiAnalyze()">🔬 تحليل المسح الحالي</button>
+      <canvas id="aiMap" class="w2" width="300" height="300" style="width:100%;max-width:300px;margin:auto;display:block;background:#0003;border-radius:8px"></canvas>
+      <div class="w2 hint" id="aiRes" style="text-align:start">اضغط «تحليل» بعد معالجة القراءات. الألوان: 🟧 فراغ/كهف · 🟦 معدن/ماء · 🟩 تربة متجانسة</div>
+      <label class="w2">ما الذي وجدته فعلاً؟ <select id="aiLabel"><option value="cave">فراغ / كهف</option><option value="metal">معدن</option><option value="wet">ماء / طين</option><option value="soil">تربة متجانسة</option></select></label>
+      <label class="w2">وصف (اختياري) <input id="aiNote" type="text" placeholder="مثال: تجويف عمقه 3م بعد الحفر"></label>
+      <button class="w2" onclick="aiSave()">➕ حفظ كعيّنة تدريب</button>
+      <button class="w2" onclick="aiUndo()">↶ حذف آخر عيّنة</button>
+      <div class="w2 hint" id="aiStat"></div>
+      <button class="w2" onclick="aiExport()">📁 تصدير ملف التعلّم (cave_learning.json)</button>
+      <label class="w2">استيراد ملف تعلّم <input type="file" accept=".json,application/json" onchange="aiImport(this)"></label>
+    </div>
     <h3>الاتصال بالجهاز (Bluetooth BLE)</h3>
     <div class="sg">
       <label class="w2">صيغة البيانات <select id="dataFormat"><option value="auto">تلقائي: سطر/عمود أو H/V</option><option value="seqH">قيمة متتابعة لقناة H</option><option value="seqV">قيمة متتابعة لقناة V</option><option value="seqPair">قيمتان متتابعتان H,V في كل سطر</option><option value="rings">دوائر الفرجار: RING_BEGIN … RING_DONE</option><option value="rowColPhases">مرحلتان: الصفوف ثم الأعمدة (ESP32)</option></select></label>
@@ -322,7 +335,7 @@ function clearAll(){
 /* ---------- الحساب ---------- */
 /* فلتر التقاطع: الخلية كهف فقط إذا شذّ سطرها (H) وعمودها (V) معاً -> الأضعف منهما */
 function xscore(){
- const hiT=$('atype').value==='high',H=[],V=[],hs=[],vs=[];
+ const hiT=atypeEff()==='high',H=[],V=[],hs=[],vs=[];
  for(let i=0;i<R;i++){H[i]=[];V[i]=[];for(let j=0;j<C;j++){const h=num($('h'+i+'_'+j)),v=num($('v'+i+'_'+j));H[i][j]=h;V[i][j]=v;if(h!==null)hs.push(h);if(v!==null)vs.push(v)}}
  const med=a=>{if(!a.length)return 0;a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2};
  const bh=med(hs),bv=med(vs),s=(x,b)=>x===null?null:Math.max(0,hiT?x-b:b-x);
@@ -460,9 +473,9 @@ function analyzeLines(dx,dy,fr,kk,rr,ut,hiT){
 /* ---------- تحليل الكهف: طريقة الخلايا (ثنائية البعد) ---------- */
 function analyze(){
  MASK=null;TG=[];CID=null;DEV=null;GHM=$('ghost').value==='dim';
- const dx=Math.max(.01,num($('dx'))||1),dy=Math.max(.01,num($('dy'))||1),fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,hiT=$('atype').value==='high'||$('metric').value==='x';
+ const dx=Math.max(.01,num($('dx'))||1),dy=Math.max(.01,num($('dy'))||1),fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,hiT=atypeEff()==='high'||$('metric').value==='x';
  G3.dx=dx;G3.dy=dy;FR=fr;
- if($('amode').value==='lines'){if(!analyzeLines(dx,dy,fr,kk,rr,ut,$('atype').value==='high')&&$('ghost').value==='hide')D=D.map(r=>r.map(()=>null));return}
+ if($('amode').value==='lines'){if(!analyzeLines(dx,dy,fr,kk,rr,ut,atypeEff()==='high')&&$('ghost').value==='hide')D=D.map(r=>r.map(()=>null));return}
  const vs=[];D.forEach(r=>r.forEach(x=>x!==null&&vs.push(x)));vs.sort((a,b)=>a-b);
  const n0=vs.length-1,bg=(vs[Math.floor(n0/2)]+vs[Math.ceil(n0/2)])/2;
  const dev=D.map(r=>r.map(x=>x===null?null:(hiT?x-bg:bg-x)));let mx=0;dev.forEach(r=>r.forEach(x=>{if(x!==null&&x>mx)mx=x}));
@@ -499,14 +512,14 @@ function showTG(){
  const el=$('tg');
  if(!TG.length){el.innerHTML='<p class="hint">'+noTGmsg()+'</p>';return}
  if(sel>=TG.length)sel=0;
- const t=TG[sel],f=x=>x.toFixed(1),lowT=$('atype').value==='low',tyTxt=lowT?'ماء أو طين أو معدن (مقاومة أقل من الوسط) — القياس وحده لا يفرّق بينها':'فراغ أو كهف (مقاومة أعلى من الوسط)',reach=t.reachMax??((num($('ll'))||10)*(num($('al'))||.4));
+ const t=TG[sel],f=x=>x.toFixed(1),lowT=atypeEff()==='low',tyTxt=(()=>{const q=tyInfo();return q.w+(q.both?' — يوجد فراغ ومعدن متجاوران في هذا المسح (الظاهر في المجسم هو الأقوى)':(lowT?' — مقاومة أقل من الوسط (قد يكون ماء أو طين أيضاً)':' — مقاومة أعلى من الوسط'))})(),reach=t.reachMax??((num($('ll'))||10)*(num($('al'))||.4));
  el.innerHTML=`<div class="row" style="justify-content:flex-start;margin-bottom:5px">${TG.map((_,i)=>`<button class="chip${i===sel?' on':''}" onclick="selT(${i})">هدف ${i+1}</button>`).join('')}${t.edge?'<span class="w">⚠ يمتد خارج المسح</span>':''}${t.small?'<span class="w">⚠ قريب من دقة المسح</span>':''}${t.floor>reach?`<span class="w">⚠ القاع أعمق من مدى الاستقصاء (~${f(reach)} م)</span>`:''}${t.amb?'<span class="w">⚠ تقاطعات وهمية محتملة</span>':''}${(t.notes||[]).map(n=>`<span class="w">⚠ ${n}</span>`).join('')}${(t.zx&&t.zy&&Math.max(t.zx,t.zy)/Math.max(1e-6,Math.min(t.zx,t.zy))>1.6)?'<span class="w">⚠ تباين بين عمق H وV</span>':''}</div>
  <p class="hint" style="margin:2px 0 6px;text-align:start">النوع المحتمل: ${tyTxt}</p>
  <div class="g3"><div class="kv k"><span>عمق السقف</span><b>${f(t.roof)} ± ${f(t.eR)} م</b></div><div class="kv k"><span>عمق القاع</span><b>${f(t.floor)} ± ${f(t.eF)} م</b></div><div class="kv"><span>الارتفاع</span><b>${f(t.H)} م</b></div>
  <div class="kv"><span>الطول × العرض</span><b>${f(t.L)} × ${f(t.W)} م</b></div><div class="kv"><span>الحجم التقريبي</span><b>${t.vol.toFixed(0)} م³</b></div>${t.compass?`<div class="kv"><span>الاتجاه · المسافة</span><b>${t.bear.toFixed(0)}° · ${f(t.dist)}±${f(t.dd)} م</b></div>`:`<div class="kv"><span>الموقع</span><b>س${f(t.cy+1)} · ع${f(t.cx+1)}</b></div>`}</div>`}
 
 /* ---------- المجسم ثلاثي الأبعاد ---------- */
-const BODY=()=>$('atype').value==='low'?{r:[96,165,250],f:[37,99,176]}:{r:[255,159,67],f:[196,104,48]};
+const BODY=()=>atypeEff()==='low'?{r:[96,165,250],f:[37,99,176]}:{r:[255,159,67],f:[196,104,48]};
 function build3(){
  P3=null;if(!D)return;
  const dx=G3.dx,dy=G3.dy,k=Math.max(1,Math.min(4,Math.ceil(36/Math.max(R,C)))),NX=(C-1)*k+1,NY=(R-1)*k+1,Wm=(C-1)*dx,Hm=(R-1)*dy,m=Math.max(Wm,Hm,1e-6),ex=dx/k,ey=dy/k,N=NX*NY;
@@ -693,7 +706,7 @@ function ringRuns(p,fr){
 let CDIAG={rings:[],runs:0,single:0,hiT:true};
 function analyzeC(){
  TG=[];MASK=null;CID=null;DEV=null;
- const hiT=$('atype').value==='high',fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,al=num($('al'))||.4,dir=$('cdir').value==='ccw'?-1:1;
+ const hiT=atypeEff()==='high',fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,al=num($('al'))||.4,dir=$('cdir').value==='ccw'?-1:1;
  const K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,as=num($('cas'))||1;
  const prof=CRAW.map(a=>lineProfile(a,hiT));CDIAG={rings:prof.map((p,k)=>p?k+1:0).filter(Boolean),runs:0,single:0,hiT};
  CNORM=CRAW.map((a,k)=>a.map((x,m)=>x===null?null:(prof[k]?prof[k].n[m]:0)));
@@ -892,7 +905,7 @@ function loadSurveyFile(file){if(!file)return;const fr=new FileReader();fr.onloa
 function reportText(){
  const s=snapshot(),f=x=>Number(x).toFixed(1),L=[];
  L.push('تقرير مسح: '+s.name,'التاريخ: '+new Date().toLocaleString('ar'),(s.settings.smode==='compass'?`نمط الفرجار: أنصاف الأقطار ${CRAD.map(r=>r.toFixed(1)).join('، ')} م ، عيّنة كل ${s.settings.cas} م`:`الشبكة: ${R}×${C} ، التباعد: ${s.settings.dx}×${s.settings.dy} م`));
- L.push('نوع الشذوذ: '+(s.settings.atype==='high'?'فراغ هوائي':'ماء/طين')+' ، القيمة: '+({m:'المحصلة',x:'تقاطع H×V',h:'H',v:'V'}[s.settings.metric]||s.settings.metric)+(s.settings.arr!=='raw'?' ، الأقطاب: '+$('arr').selectedOptions?.[0]?.text:''));
+ L.push('نوع الشذوذ: '+({high:'فراغ هوائي',low:'معدن/ماء/طين',all:'بحث شامل'}[s.settings.atype]||'')+' ، القيمة: '+({m:'المحصلة',x:'تقاطع H×V',h:'H',v:'V'}[s.settings.metric]||s.settings.metric)+(s.settings.arr!=='raw'?' ، الأقطاب: '+$('arr').selectedOptions?.[0]?.text:''));
  L.push('معايرة: k='+s.settings.kd+' ، ارتفاع/عرض='+s.settings.hr+' ، عدم اليقين='+s.settings.ut+'%'+' ، L='+s.settings.ll+' م ، α='+s.settings.al,'');
  if(!s.result.length)L.push('لا يوجد هدف واضح.');
  s.result.forEach((t,i)=>L.push(`الهدف ${i+1}: ${t.bear!==undefined?'الاتجاه '+f(t.bear)+'° والمسافة '+f(t.dist)+' م':'الموقع س'+f(t.row)+' ع'+f(t.col)} ، الأبعاد ${f(t.L)}×${f(t.W)} م ، الارتفاع ${f(t.H)} م`,`   السقف ${f(t.roof)} ± ${f(t.eR)} م ، القاع ${f(t.floor)} ± ${f(t.eF)} م ، الحجم ≈ ${t.vol.toFixed(0)} م³${t.edge?' (يمتد خارج المسح)':''}`));
@@ -934,7 +947,7 @@ function devCommand(kind,key,val){
   if(kind==='CFG'){
    if(key==='MODE'){setSM(/^compass$/i.test(val)?'compass':'grid');status('الجهاز: وضع '+(/^compass$/i.test(val)?'الفرجار':'الشبكة'));return}
    if(DEV_CHK[key]){const e=$(DEV_CHK[key]);if(!e)return;e.checked=(val==='1'||/^(on|true)$/i.test(val));e.dispatchEvent(new Event('change',{bubbles:true}));status('الجهاز: '+key+'='+val);return}
-   const id=DEV_CFG[key];const e=id&&$(id);if(!e){status('إعداد غير معروف من الجهاز: '+key);return}
+   if(key==='ATYPE'&&$('atype').value==='all')return;const id=DEV_CFG[key];const e=id&&$(id);if(!e){status('إعداد غير معروف من الجهاز: '+key);return}
    if(e.tagName==='SELECT'){const ok=[...e.options].some(o=>o.value===val.toLowerCase());if(!ok){status('قيمة غير صالحة من الجهاز: '+key+'='+val);return}e.value=val.toLowerCase();e.dispatchEvent(new Event('change',{bubbles:true}))}
    else{e.value=val;e.dispatchEvent(new Event('input',{bubbles:true}))}
    status('الجهاز: '+key+'='+val);return}
@@ -1080,6 +1093,52 @@ ringLine=function(line){_rl(line);
  if(/^RING_DONE/i.test(String(line).trim())&&lastK>=0){const N=CN[lastK],miss=[];
   for(let q=0;q<N;q++){const e=$('c'+lastK+'_'+q);if(!e||e.value==='')miss.push(q+1)}
   if(miss.length)qWarn('⚠ دائرة '+(lastK+1)+': عيّنات ناقصة '+miss.join('، ')+' — أعد قياسها')}};
+/* ---------- بحث شامل + ذكاء محلي ---------- */
+let AUTO_T='high';
+function atypeEff(){const v=$('atype').value;return v==='all'?AUTO_T:v}
+let AUTO_HI=0,AUTO_LO=0;
+function tyInfo(){const v=$('atype').value,h=AUTO_HI,l=AUTO_LO,sure=z=>z>=3?'':' محتمل';
+ if(v==='high')return{w:'فراغ'+sure(h)};if(v==='low')return{w:'معدن'+sure(l)};
+ const hs=h>=2,ls=l>=2;if(hs&&ls)return{w:'فراغ'+sure(h)+' + معدن'+sure(l),both:true};if(!hs&&!ls)return{w:'تربة متجانسة (لا شذوذ واضح)'};return h>=l?{w:'فراغ'+sure(h)}:{w:'معدن'+sure(l)}}
+function updLabels(){const b=$('bm');if(!b)return;const i=tyInfo();b.textContent='شكل '+(i.w.indexOf('تربة')===0?'التربة':i.w)}
+function updAuto(){try{let z=[];
+ if(isComp()){for(let k=0;k<CRAD.length;k++){const r=[];for(let m=0;m<CN[k];m++){const e=$('c'+k+'_'+m),x=e?parseFloat(e.value):NaN;if(Number.isFinite(x))r.push(x)}
+  if(r.length>2){const mu=r.reduce((a,b)=>a+b,0)/r.length;z.push(...r.map(x=>x/(mu||1)))}}}
+ else document.querySelectorAll('#tin input').forEach(e=>{const x=parseFloat(e.value);if(Number.isFinite(x))z.push(x)});
+ if(z.length<4)return;const mu=z.reduce((a,b)=>a+b,0)/z.length,sd=Math.sqrt(z.reduce((a,b)=>a+(b-mu)**2,0)/z.length)||1e-9;
+ const md=x=>{const q=[...x].sort((p,r)=>p-r),n=q.length;return n%2?q[(n-1)/2]:(q[n/2-1]+q[n/2])/2},me=md(z),rs=Math.max(1.4826*md(z.map(x=>Math.abs(x-me))),.05*Math.abs(me),1e-9);AUTO_HI=(Math.max(...z)-me)/rs;AUTO_LO=(me-Math.min(...z))/rs;if($('atype').value==='all')AUTO_T=AUTO_HI>=AUTO_LO?'high':'low';updLabels()}catch(e){}}
+['changed','refresh','run'].forEach(n=>{if(typeof window[n]==='function'){const f=window[n];window[n]=function(...a){updAuto();return f.apply(this,a)}}});
+const AIK='cave-ai-v1',AI_CL={cave:'فراغ / كهف',metal:'معدن',wet:'ماء / طين',soil:'تربة متجانسة'},AI_COL={cave:'#ff9f43',metal:'#4da3ff',wet:'#2ec4b6',soil:'#7bd88f'};
+function aiLoad(){try{return JSON.parse(localStorage.getItem(AIK)||'[]')}catch(e){return[]}}
+function aiStore(a){try{localStorage.setItem(AIK,JSON.stringify(a))}catch(e){}}
+function aiPts(){const P=[];
+ if(isComp()){const R_=CRAW;if(!R_||!R_.length)return null;R_.forEach((row,k)=>{const f=row.filter(Number.isFinite),mu=f.reduce((a,b)=>a+b,0)/(f.length||1)||1;row.forEach((x,m)=>{if(Number.isFinite(x)){const a=2*Math.PI*m/row.length,r=CRAD[k]||k+1;P.push({x:r*Math.sin(a),y:-r*Math.cos(a),v:x/mu})}})})}
+ else{if(!D)return null;D.forEach((row,i)=>row.forEach((x,j)=>{if(Number.isFinite(x))P.push({x:j,y:i,v:x})}))}
+ return P.length>=6?P:null}
+function aiFeat(v){const n=v.length,mu=v.reduce((a,b)=>a+b,0)/n,sd=Math.sqrt(v.reduce((a,b)=>a+(b-mu)**2,0)/n)||1e-9,mx=Math.max(...v),mn=Math.min(...v),m=Math.abs(mu)||1e-9;
+ return[sd/m,(mx-mu)/sd,(mu-mn)/sd,v.filter(x=>x>mu+sd).length/n,v.filter(x=>x<mu-sd).length/n,v.reduce((a,b)=>a+((b-mu)/sd)**3,0)/n,Math.max(-5,Math.min(5,mx/m)),Math.max(-5,Math.min(5,mn/m))].map(x=>Number.isFinite(x)?x:0)}
+const AI_SC=[.5,3,3,.3,.3,2,3,3];
+function aiPredict(f){const S=aiLoad();
+ if(S.length<2){const c=(f[1]<2&&f[2]<2)?'soil':(f[1]>=f[2]?'cave':'metal');return{c,conf:null,note:'تقدير مبدئي بقاعدة بسيطة — لا توجد عيّنات تدريب كافية'}}
+ const d=S.map(s=>({c:s.label,d:Math.sqrt(s.f.reduce((a,x,i)=>a+((x-f[i])/AI_SC[i])**2,0))})).sort((a,b)=>a.d-b.d).slice(0,Math.min(3,S.length)),sc={};
+ d.forEach(o=>{sc[o.c]=(sc[o.c]||0)+1/(o.d+.05)});const tot=Object.values(sc).reduce((a,b)=>a+b,0),c=Object.keys(sc).sort((a,b)=>sc[b]-sc[a])[0];
+ return{c,conf:Math.round(100*sc[c]/tot),note:'مبني على '+S.length+' عيّنة تدريب'}}
+let AI_LAST=null;
+function aiStat(){const S=aiLoad(),c={};S.forEach(s=>c[s.label]=(c[s.label]||0)+1);$('aiStat').textContent='عيّنات التدريب: '+S.length+(S.length?' ('+Object.keys(c).map(k=>AI_CL[k]+' '+c[k]).join(' · ')+')':'')}
+function aiAnalyze(){const P=aiPts();if(!P){$('aiRes').textContent='لا توجد نتائج معالجة بعد: أدخل القراءات ثم اضغط «معالجة وعرض الخريطة».';return}
+ const v=P.map(p=>p.v),f=aiFeat(v),pr=aiPredict(f);AI_LAST={f,pr};
+ const mu=v.reduce((a,b)=>a+b,0)/v.length,sd=Math.sqrt(v.reduce((a,b)=>a+(b-mu)**2,0)/v.length)||1e-9,lowC=(pr.c==='metal'||pr.c==='wet')?AI_COL[pr.c]:AI_COL.metal;
+ const cv=$('aiMap'),g=cv.getContext('2d');g.clearRect(0,0,300,300);
+ const xs=P.map(p=>p.x),ys=P.map(p=>p.y),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),sc=270/Math.max(x1-x0,y1-y0,1e-6),sz=isComp()?14:Math.max(8,Math.min(40,270/(Math.max(...xs)+1||1)));
+ P.forEach(p=>{g.fillStyle=p.v>mu+sd?AI_COL.cave:(p.v<mu-sd?lowC:AI_COL.soil);const X=15+(p.x-x0)*sc,Y=15+(p.y-y0)*sc;if(isComp()){g.beginPath();g.arc(X,Y,sz/2,0,7);g.fill()}else g.fillRect(X,Y,sz-1,sz-1)});
+ $('aiRes').innerHTML='<b>التصنيف المقترح: <span style="color:'+AI_COL[pr.c]+'">'+AI_CL[pr.c]+'</span></b>'+(pr.conf!==null?' · ثقة '+pr.conf+'%':'')+'<br>'+pr.note+'<br>إذا فحصتَ الموقع فعلاً اختر ما وجدته بالأسفل واحفظه ليتعلّم التطبيق.';aiStat()}
+function aiSave(){if(!AI_LAST){aiAnalyze();if(!AI_LAST)return}
+ const S=aiLoad();S.push({f:AI_LAST.f,label:$('aiLabel').value,note:$('aiNote').value,date:new Date().toISOString(),site:($('mSite')||{}).value||'',gps:($('mGps')&&$('mGps').dataset.v)||'',mode:isComp()?'compass':'grid'});aiStore(S);$('aiNote').value='';aiStat();
+ const pr=aiPredict(AI_LAST.f);$('aiRes').innerHTML+='<br>✔ حُفظت العيّنة. التصنيف بعد التعلّم: <b>'+AI_CL[pr.c]+'</b>'}
+function aiUndo(){const S=aiLoad();S.pop();aiStore(S);aiStat()}
+function aiExport(){dl('cave_learning.json',JSON.stringify({app:'cave-ai',ver:1,date:new Date().toISOString(),samples:aiLoad()}),'application/json')}
+function aiImport(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.app!=='cave-ai'||!Array.isArray(o.samples))throw Error('ملف غير صالح');const S=aiLoad(),k=new Set(S.map(x=>x.date+x.label));let n=0;o.samples.forEach(x=>{if(Array.isArray(x.f)&&x.f.length===8&&AI_CL[x.label]&&!k.has(x.date+x.label)){S.push(x);n++}});aiStore(S);aiStat();$('aiRes').textContent='تم استيراد '+n+' عيّنة جديدة'}catch(e){$('aiRes').textContent='فشل الاستيراد: '+e.message}};r.readAsText(f)}
+window.addEventListener('load',()=>{try{aiStat()}catch(e){}});
 /* اقتران أول مرة: يحتاج لمسة من المستخدم (قيد المتصفح) */
 async function connectInput(){
  if(!navigator.bluetooth){status('Web Bluetooth غير متاح: استخدم Chrome أو Edge وصفحة HTTPS (لا يعمل على Safari/iPhone).');return}
