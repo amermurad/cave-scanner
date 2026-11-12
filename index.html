@@ -126,7 +126,7 @@ textarea{resize:vertical}
       <label>نق₀ (م)<input class="num" id="cr0" type="text" inputmode="decimal" value="2" title="نصف قطر المدار الأول = الخطوة بين المدارات"></label>
       <label>الدوائر<input class="num" id="cnr" type="text" inputmode="numeric" value="3"></label>
       <label>عيّنات/مدار<input class="num" id="cns" type="text" inputmode="numeric" value="12" title="عدد الشعاعات: نفس العدد في كل المدارات"></label>
-      <label>القوس (م)<input class="num" id="cas" type="text" inputmode="decimal" value="1"></label>
+      <label>القوس (م) · تلقائي<input class="num" id="cas" type="text" inputmode="decimal" value="1" readonly title="أكبر مسافة بين عيّنتين على محيط أي دائرة = 2π×نق÷عدد العيّنات. تُحسب تلقائياً لكل دائرة"></label>
       <label style="display:none"><input class="num" id="crs" type="text" value="2"></label>
     </div>
     <div class="opt">
@@ -204,6 +204,20 @@ textarea{resize:vertical}
       <div class="w2 hint" id="aiStat"></div>
       <button class="w2" onclick="aiExport()">📁 تصدير ملف التعلّم (cave_learning.json)</button>
       <label class="w2">استيراد ملف تعلّم <input type="file" accept=".json,application/json" onchange="aiImport(this)"></label>
+    </div>
+    <h3>📊 أدوات الجودة والتقارير</h3>
+    <div class="sg">
+      <button class="w2" onclick="rptOpen()">🖨 تقرير PDF للمسح الحالي</button>
+      <div class="w2 hint"><b>معايرة الجهاز</b> (قِس مقاومة معروفة وأدخل القيمتين)</div>
+      <label class="w2">القيمة المعروفة <input id="calExp" type="text" inputmode="decimal"></label>
+      <label class="w2">قراءة الجهاز <input id="calMeas" type="text" inputmode="decimal"></label>
+      <button class="w2" onclick="calSave()">✔ تسجيل المعايرة</button>
+      <div class="w2 hint" id="calRes"></div><div class="w2 hint" id="calLast"></div>
+      <div class="w2 hint"><b>مقارنة مسحين</b> لنفس الموقع (نفس النمط والأبعاد)</div>
+      <button class="w2" onclick="snapSave()">📌 حفظ المسح الحالي كمرجع</button>
+      <button class="w2" onclick="snapCompare()">🔀 مقارنة المسح الحالي بالمرجع</button>
+      <canvas id="cmpMap" class="w2" width="300" height="300" style="width:100%;max-width:300px;margin:auto;display:block;background:#0003;border-radius:8px"></canvas>
+      <div class="w2 hint" id="cmpRes" style="text-align:start">🟧 زادت المقاومة · 🟦 نقصت · 🟩 لم تتغير (حد التغيّر 15%)</div>
     </div>
     <h3>الاتصال بالجهاز (Bluetooth BLE)</h3>
     <div class="sg">
@@ -670,8 +684,8 @@ function clearC(){
  if(hasAnyC()&&!ask2('clear','سيتم مسح قراءات الفرجار'))return;
  document.querySelectorAll('#cin input').forEach(e=>e.value='');resetRxState();changed()}
 function cHintUpdate(){
- $('cHint').style.color='';const d=cdims(),g=GTG&&GTG[0];
- $('cHint').textContent='الدوائر: '+d.rad.map(r=>r.toFixed(1)).join('، ')+' م · العيّنات: '+d.cn.join('، ')+($('csub')&&$('csub').checked&&d.rad.length>1?' · الصافي = قراءة المدار − قراءة المدار الأول بنفس الاتجاه':'')+(g?' · هدف الشبكة 1 عند س'+(g.cy+1).toFixed(1)+' · ع'+(g.cx+1).toFixed(1)+' — ضع مركز الفرجار هناك':'')}
+ $('cHint').style.color='';const d=cdims(),g=GTG&&GTG[0];try{$('cas').value=Math.max(...d.rad.map((r,i)=>2*Math.PI*r/d.cn[i])).toFixed(1)}catch(e){}
+ $('cHint').textContent='الدوائر: '+d.rad.map(r=>r.toFixed(1)).join('، ')+' م · العيّنات: '+d.cn.join('، ')+' · المسافة بين العيّنات على المحيط: '+d.rad.map((r,i)=>(2*Math.PI*r/d.cn[i]).toFixed(1)).join('، ')+' م'+($('csub')&&$('csub').checked&&d.rad.length>1?' · الصافي = قراءة المدار − قراءة المدار الأول بنفس الاتجاه':'')+(g?' · هدف الشبكة 1 عند س'+(g.cy+1).toFixed(1)+' · ع'+(g.cx+1).toFixed(1)+' — ضع مركز الفرجار هناك':'')}
 function setSM(m){
  if(m!=='grid'&&m!=='compass')m='grid';
  $('smode').value=m;const c=m==='compass';
@@ -727,8 +741,9 @@ function analyzeC(){
   const bp=dir*bear*Math.PI/180,east=rho*Math.sin(bp),north=rho*Math.cos(bp),notes=['الطول على امتداد نصف القطر مفترض = العرض'];
   if(K>1&&t.rings.length<2)notes.push(kOn===K-1?'ظهر عند الدائرة الأخيرة فقط':'ظهر في دائرة واحدة فقط (نق '+CRAD[kOn].toFixed(1)+' م) — ثقة أقل');
   if(zc0>1.2*reachOn)notes.push('العمق المقدّر أكبر من مدى الاستقصاء عند أول دائرة');
-  all.push({L:W,W,roof,floor,H,zc:(roof+floor)/2,vol:Math.PI/6*W*W*H,cy:0,cx:0,bear,dist:rho,dd,east,north,wx:Rm+east,wy:Rm-north,
-   eR:Math.hypot(ut*roof,dd/rho*zc0),eF:Math.hypot(ut*floor,dd/rho*zc0),pct:t.rings[0].con*100,sum:sw,edge:false,small:W<2*as,notes,reachMax:al*CRAD[K-1],compass:true,cells:[]})});
+  const arcOn=2*Math.PI*rOn/CN[kOn];if(W<2*arcOn)notes.push('العرض المقدّر أقل من ضعف المسافة بين العيّنات ('+arcOn.toFixed(1)+' م) عند هذه الدائرة — الهدف قد يكون أصغر من دقة المسح');
+   all.push({L:W,W,roof,floor,H,zc:(roof+floor)/2,vol:Math.PI/6*W*W*H,cy:0,cx:0,bear,dist:rho,dd,east,north,wx:Rm+east,wy:Rm-north,
+   eR:Math.hypot(ut*roof,dd/rho*zc0),eF:Math.hypot(ut*floor,dd/rho*zc0),pct:t.rings[0].con*100,sum:sw,edge:false,small:W<2*arcOn,notes,reachMax:al*CRAD[K-1],compass:true,cells:[]})});
  all.sort((a,b)=>b.sum-a.sum);TG=all.slice(0,4)}
 /* قيمة الحقل القطبي عند نقطة (شرق، شمال) بالأمتار -> SV/SW ، وتعيد false خارج المدى */
 function cfield(east,north){
@@ -1058,7 +1073,7 @@ async function sendDims(){
   if(await sendCmd('SET_MODE|GRID')){await sleep(250);await sendCmd('CONFIG|GRID|'+r+'|'+c)}}}
 const _pr=placeReading;
 placeReading=function(k,r,c,v){const el=$(String(k).toLowerCase()+(Number(r)-1)+'_'+(Number(c)-1));const prev=el?el.value:null;const ok=_pr(k,r,c,v);if(ok&&el){HIST.push([el,prev]);if(HIST.length>300)HIST.shift()}return ok};
-function undoLast(){const h=HIST.pop();if(!h){status('لا توجد قراءة للتراجع (التراجع لقراءات الشبكة)');return}h[0].value=h[1];if($('dataFormat').value!=='auto'&&seqIndex>0)seqIndex--;changed();status('تم التراجع عن آخر قراءة')}
+function undoLast(){const h=HIST.pop();if(!h){status('لا توجد قراءة للتراجع ');return}h[0].value=h[1];if($('dataFormat').value!=='auto'&&seqIndex>0)seqIndex--;changed();status('تم التراجع عن آخر قراءة')}
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
 function metaGet(){return{site:$('mSite').value,notes:$('mNotes').value,gps:$('mGps').dataset.v||''}}
 function metaSave(){try{localStorage.setItem('cave-meta',JSON.stringify(metaGet()))}catch(e){}}
@@ -1083,8 +1098,8 @@ function spikeCheck(el,nb){el.style.outline='';el.title='';const v=parseFloat(el
  if((hi>0&&v>hi*2.5)||(lo>0&&v<lo*0.4)){el.style.outline='3px solid #ff5252';el.title='قراءة معزولة: تحقق من تلامس القطب';return true}return false}
 let lastK=-1;
 const _pring=putRing;
-putRing=function(k,m,v){const ok=_pring(k,m,v);
- if(ok){lastK=k;const N=CN[k],bad=[];
+putRing=function(k,m,v){const el0=$('c'+k+'_'+m),pv0=el0?el0.value:null;const ok=_pring(k,m,v);
+ if(ok){if(el0){HIST.push([el0,pv0]);if(HIST.length>300)HIST.shift()}lastK=k;const N=CN[k],bad=[];
   [m-1,m].forEach(q=>{if(q<0)return;const e=$('c'+k+'_'+q);if(!e)return;if(spikeCheck(e,[$('c'+k+'_'+((q-1+N)%N)),$('c'+k+'_'+((q+1)%N))]))bad.push(q+1)});
   if(bad.length)qWarn('⚠ دائرة '+(k+1)+': قراءة معزولة عند العيّنة '+bad.join('، ')+' — تحقق من تلامس القطب وأعد القياس')}
  return ok};
@@ -1139,6 +1154,36 @@ function aiUndo(){const S=aiLoad();S.pop();aiStore(S);aiStat()}
 function aiExport(){dl('cave_learning.json',JSON.stringify({app:'cave-ai',ver:1,date:new Date().toISOString(),samples:aiLoad()}),'application/json')}
 function aiImport(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.app!=='cave-ai'||!Array.isArray(o.samples))throw Error('ملف غير صالح');const S=aiLoad(),k=new Set(S.map(x=>x.date+x.label));let n=0;o.samples.forEach(x=>{if(Array.isArray(x.f)&&x.f.length===8&&AI_CL[x.label]&&!k.has(x.date+x.label)){S.push(x);n++}});aiStore(S);aiStat();$('aiRes').textContent='تم استيراد '+n+' عيّنة جديدة'}catch(e){$('aiRes').textContent='فشل الاستيراد: '+e.message}};r.readAsText(f)}
 window.addEventListener('load',()=>{try{aiStat()}catch(e){}});
+/* ---------- تقرير ومعايرة ومقارنة ---------- */
+function rptOpen(){const m=metaGet(),i=tyInfo(),E=x=>String(x==null?'':x).replace(/[<&]/g,c=>c==='<'?'&lt;':'&amp;');
+ const tg=(typeof TG!=='undefined'&&TG||[]).map((t,k)=>'<tr><td>'+(k+1)+'</td><td>'+t.roof.toFixed(1)+'</td><td>'+t.floor.toFixed(1)+'</td><td>'+(t.W||0).toFixed(1)+'</td><td>'+(t.vol||0).toFixed(0)+'</td><td>'+(t.bear!==undefined?t.bear.toFixed(0)+'° / '+t.dist.toFixed(1)+' م':'-')+'</td></tr>').join('');
+ const cs=[...document.querySelectorAll('canvas')].filter(c=>c.id!=='aiMap'&&c.id!=='cmpMap'&&c.width>150).sort((a,b)=>b.width*b.height-a.width*a.height),im=[];
+ [cs[0],AI_LAST?$('aiMap'):null].forEach(c=>{try{if(c)im.push('<img src="'+c.toDataURL('image/png')+'" style="max-width:48%;border:1px solid #ccc">')}catch(e){}});
+ const pr=AI_LAST?AI_LAST.pr:null,c=calLoad().slice(-1)[0];
+ const h='<!doctype html><html dir="rtl" lang="ar"><meta charset="utf-8"><title>تقرير مسح</title><body style="font-family:sans-serif;padding:18px;max-width:800px;margin:auto"><h2>تقرير منظومة مسح الكهوف الذكية</h2><p>التاريخ: '+new Date().toLocaleString('ar')+'<br>الموقع: '+E(m.site)+'<br>الإحداثيات: '+E(m.gps)+'<br>ملاحظات: '+E(m.notes)+'</p><p><b>النمط:</b> '+(isComp()?'فرجار':'شبكة')+' · <b>النتيجة:</b> '+E(i.w)+(pr?' · <b>تصنيف الذكاء المحلي:</b> '+AI_CL[pr.c]+(pr.conf!==null?' ('+pr.conf+'%)':''):'')+'</p>'+(c?'<p>آخر معايرة: '+new Date(c.d).toLocaleDateString('ar')+' · انحراف '+c.dev.toFixed(1)+'%</p>':'')+(tg?'<table border="1" cellpadding="5" style="border-collapse:collapse;width:100%;text-align:center"><tr><th>#</th><th>السقف م</th><th>القاع م</th><th>العرض م</th><th>الحجم م³</th><th>الاتجاه/المسافة</th></tr>'+tg+'</table>':'<p>لا توجد أهداف محسوبة.</p>')+'<div style="margin-top:12px">'+im.join(' ')+'</div><p style="color:#a00;font-size:12px">التقديرات رياضية من قياس المقاومة وتحتاج تحققاً ميدانياً؛ الماء والطين والمعدن يتشابه أثرها.</p><hr><p style="text-align:center;font-size:12px">جميع حقوق الحماية محفوظة © Murad Hasan Alhasheesh 2024</p></body></html>';
+ const w=window.open('','_blank');if(w){w.document.write(h);w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},500)}else dl('cave_report.html',h,'text/html')}
+const CALK='cave-cal-v1';
+function calLoad(){try{return JSON.parse(localStorage.getItem(CALK)||'[]')}catch(e){return[]}}
+function calShow(){const l=calLoad().slice(-1)[0];if($('calLast'))$('calLast').textContent=l?'آخر معايرة: '+new Date(l.d).toLocaleString('ar')+' · انحراف '+l.dev.toFixed(1)+'%':'لم تُجرَ معايرة بعد'}
+function calSave(){const ex=parseFloat($('calExp').value),mv=parseFloat($('calMeas').value);if(!(ex>0)||!Number.isFinite(mv)){$('calRes').textContent='أدخل القيمة المعروفة وقراءة الجهاز';return}
+ const dev=(mv-ex)/ex*100,a=calLoad();a.push({d:new Date().toISOString(),ex,mv,dev});try{localStorage.setItem(CALK,JSON.stringify(a.slice(-20)))}catch(e){}
+ $('calRes').textContent=(Math.abs(dev)<=5?'✅ المعايرة سليمة':'⚠ انحراف كبير — افحص الأقطاب والبطارية قبل المسح')+' · الانحراف '+dev.toFixed(1)+'%';calShow()}
+const SNK='cave-snap-v1';
+function drawPts(cv,P,col){const g=cv.getContext('2d');g.clearRect(0,0,300,300);const xs=P.map(p=>p.x),ys=P.map(p=>p.y),x0=Math.min(...xs),y0=Math.min(...ys),sc=270/Math.max(Math.max(...xs)-x0,Math.max(...ys)-y0,1e-6),sz=isComp()?14:Math.max(8,Math.min(40,270/(Math.max(...xs)+1||1)));
+ P.forEach((p,i)=>{g.fillStyle=col(p,i);const X=15+(p.x-x0)*sc,Y=15+(p.y-y0)*sc;if(isComp()){g.beginPath();g.arc(X,Y,sz/2,0,7);g.fill()}else g.fillRect(X,Y,sz-1,sz-1)})}
+function snapSave(){const P=aiPts();if(!P){$('cmpRes').textContent='عالج القراءات أولاً';return}try{localStorage.setItem(SNK,JSON.stringify({d:new Date().toISOString(),c:isComp(),v:P.map(p=>[p.x,p.y,p.v])}))}catch(e){}$('cmpRes').textContent='حُفظ المسح كمرجع ('+P.length+' نقطة)'}
+function snapCompare(){const P=aiPts();let S=null;try{S=JSON.parse(localStorage.getItem(SNK)||'null')}catch(e){}
+ if(!S){$('cmpRes').textContent='لا يوجد مسح مرجعي محفوظ';return}
+ if(!P||P.length!==S.v.length||S.c!==isComp()){$('cmpRes').textContent='المسح الحالي لا يطابق المرجع في النمط أو عدد النقاط';return}
+ const r=P.map((p,i)=>{const o=S.v[i][2];return Math.abs(o)>1e-9?(p.v-o)/Math.abs(o):0}),th=.15;
+ drawPts($('cmpMap'),P,(p,i)=>r[i]>th?AI_COL.cave:(r[i]<-th?AI_COL.metal:AI_COL.soil));
+ const n=r.filter(x=>Math.abs(x)>th).length,mx=Math.max(...r.map(Math.abs));
+ $('cmpRes').textContent='تغيّرت '+n+' من '+P.length+' نقطة ('+Math.round(100*n/P.length)+'%) · أكبر تغيّر '+Math.round(mx*100)+'% · المرجع بتاريخ '+new Date(S.d).toLocaleDateString('ar')}
+let lastGW='';
+function gridSpikes(){if(isComp()||!D)return;const bad=[];D.forEach((row,i)=>row.forEach((v,j)=>{if(!Number.isFinite(v))return;const n=[[i-1,j],[i+1,j],[i,j-1],[i,j+1]].map(([a,b])=>D[a]&&D[a][b]).filter(Number.isFinite);if(n.length<3)return;const hi=Math.max(...n),lo=Math.min(...n);if((hi>0&&v>hi*2.5)||(lo>0&&v<lo*.4))bad.push('س'+(i+1)+'×ع'+(j+1))}));
+ const m=bad.length?'⚠ خلايا معزولة (سوء تلامس محتمل): '+bad.slice(0,5).join('، ')+' — أعد قياسها':'';if(m&&m!==lastGW)qWarn(m);lastGW=m}
+if(typeof window.refresh==='function'){const _rf3=window.refresh;window.refresh=function(...a){const r=_rf3.apply(this,a);try{gridSpikes()}catch(e){}return r}}
+window.addEventListener('load',()=>{try{calShow()}catch(e){}});
 /* اقتران أول مرة: يحتاج لمسة من المستخدم (قيد المتصفح) */
 async function connectInput(){
  if(!navigator.bluetooth){status('Web Bluetooth غير متاح: استخدم Chrome أو Edge وصفحة HTTPS (لا يعمل على Safari/iPhone).');return}
