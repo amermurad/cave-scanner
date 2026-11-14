@@ -382,7 +382,10 @@ function compute(){
   const x=m==='x'?X[i][j]:(m==='h'?(h??0):m==='v'?(v??0):Math.hypot(h||0,v||0))*KK.K;M[i][j]=x;vals.push(x)}}
  if(!vals.length){D=null;return false}
  const s=[...vals].sort((a,b)=>a-b),q=p=>s[Math.min(s.length-1,Math.max(0,Math.round(p*(s.length-1))))],cl=$('clip').checked&&s.length>=6;
- lo=cl?q(.05):s[0];hi=cl?q(.95):s[s.length-1];if(hi-lo<1e-12)hi=lo+1;D=M;return true}
+ lo=cl?q(.05):s[0];hi=cl?q(.95):s[s.length-1];if(hi-lo<1e-12)hi=lo+1;
+ /* لا نُكبّر فروقاً أصغر من حدّ الشذوذ: نوسّع مقياس الألوان ليبقى حول الوسط فتظهر الأرض المتجانسة بلون واحد تقريباً */
+ {const mid=(lo+hi)/2,ms=minAn()*Math.abs(mid);if(ms>0&&hi-lo<ms){lo=mid-ms/2;hi=mid+ms/2}}
+ D=M;return true}
 function run(){if(refresh(true))setTab(1)}
 function refresh(force){if(!(isComp()?computeC():compute())){if(force)alert('لم تُدخل أي بيانات');return false}draw();return true}
 function changed(){save();clearTimeout(timer);timer=setTimeout(()=>{if(isComp()?CD:D)refresh()},200)}
@@ -530,6 +533,7 @@ function noTGmsg(){
  return base+'ظهرت قمم في الدوائر '+d.rings.join('، ')+' لكنها لم تُجمع كهفاً واحداً. خفّض «عتبة الحدود» من الإعدادات أو زِد العيّنات.'}
 function showTG(){
  const el=$('tg');
+ {const bb=$('bm');if(bb&&!isComp()&&D&&!TG.length)bb.textContent='شكل التربة (لا شذوذ)'}
  if(!TG.length){el.innerHTML='<p class="hint">'+noTGmsg()+'</p>';return}
  if(sel>=TG.length)sel=0;
  const t=TG[sel],f=x=>x.toFixed(1),lowT=atypeEff()==='low',tyTxt=(()=>{const q=tyInfo();return q.w+(q.both?' — يوجد فراغ ومعدن متجاوران في هذا المسح (الظاهر في المجسم هو الأقوى)':(lowT?' — مقاومة أقل من الوسط (قد يكون ماء أو طين أيضاً)':' — مقاومة أعلى من الوسط'))})(),reach=t.reachMax??((num($('ll'))||10)*(num($('al'))||.4));
