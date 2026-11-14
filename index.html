@@ -982,6 +982,10 @@ function consumeLine(line){
  if(stm){const nm={ERROR_TIMEOUT:'انتهت مهلة القياس — مقاومة عالية جداً أو قطب غير متصل',BLE_CONNECTED:'الجهاز متصل',READY:'الجهاز جاهز'}[stm[1].trim().toUpperCase()];status(nm||('الجهاز: '+stm[1]));return}
  const dv=line.match(/^(CFG|CMD)\s*\|\s*([A-Za-z0-9_]+)\s*(?:\|\s*(.*))?$/i);
  if(dv){devCommand(dv[1].toUpperCase(),dv[2].toUpperCase(),(dv[3]||'').trim());return}
+ if(/^(CONTACTS|CT)\|/i.test(line)){ctLine(line);return}
+ if(/^(ROW|COL),/i.test(line)){rcLine(line);return}
+ if($('dataFormat').value==='auto'&&/^ROWS_DONE$/i.test(line.trim())){status('انتهت مرحلة الأسطر (H) — ابدأ الآن بالأعمدة (V)');return}
+ if($('dataFormat').value==='auto'&&/^COLS_DONE$/i.test(line.trim())){status('✓ اكتملت دورة المسح: H و V');return}
  if(/^(R[\s,]|RING_BEGIN|RING_DONE)/i.test(line)){ringLine(line);return}
  const fmt=$('dataFormat').value;let ok=false;
  if(fmt==='rings'){ringLine(line);return}
@@ -1073,7 +1077,19 @@ async function sendDims(){
   if(await sendCmd('SET_MODE|GRID')){await sleep(250);await sendCmd('CONFIG|GRID|'+r+'|'+c)}}}
 const _pr=placeReading;
 placeReading=function(k,r,c,v){const el=$(String(k).toLowerCase()+(Number(r)-1)+'_'+(Number(c)-1));const prev=el?el.value:null;const ok=_pr(k,r,c,v);if(ok&&el){HIST.push([el,prev]);if(HIST.length>300)HIST.shift()}return ok};
-function undoLast(){const h=HIST.pop();if(!h){status('لا توجد قراءة للتراجع ');return}h[0].value=h[1];if($('dataFormat').value!=='auto'&&seqIndex>0)seqIndex--;changed();status('تم التراجع عن آخر قراءة')}
+let GRP=0;
+/* قراءة سطر/عمود كاملة: ROW,i,قيمة → تملأ الخانات الفارغة في H للسطر i ؛ COL,j,قيمة → الخانات الفارغة في V للعمود j */
+function rcLine(line){
+ const a=line.split(/[ ,]+/).filter(Boolean),isRow=a[0].toUpperCase()==='ROW',idx=Number(a[1]),x=Number(norm(String(a[2]||'')));
+ if(!Number.isInteger(idx)||idx<1||idx>(isRow?R:C)||!Number.isFinite(x)){status('تعذر تفسير: '+line);return}
+ const g=++GRP;let n=0;
+ for(let t=0;t<(isRow?C:R);t++){
+  const i=isRow?idx-1:t,j=isRow?t:idx-1,el=$((isRow?'h':'v')+i+'_'+j),w=$('w'+i+'_'+j);
+  if(!el||w.dataset.off||el.value.trim()!=='')continue;
+  HIST.push([el,el.value,g]);el.value=String(x);w.classList.remove('off');w.dataset.off='';n++}
+ if(HIST.length>600)HIST.splice(0,HIST.length-600);
+ changed();status((isRow?'السطر '+idx+' (H)':'العمود '+idx+' (V)')+': '+x+' ← '+n+' خلية')}
+function undoLast(){const h=HIST.pop();if(!h){status('لا توجد قراءة للتراجع ');return}h[0].value=h[1];if(h[2]){while(HIST.length&&HIST[HIST.length-1][2]===h[2]){const q=HIST.pop();q[0].value=q[1]}document.querySelectorAll('.hv').forEach(w=>{const i=w.id.slice(1);const a=$('h'+i),b=$('v'+i);if(a&&b&&a.value.trim()===''&&b.value.trim()===''){w.classList.add('off');w.dataset.off=1}});changed();status('تم التراجع عن آخر سطر/عمود');return}if($('dataFormat').value!=='auto'&&seqIndex>0)seqIndex--;changed();status('تم التراجع عن آخر قراءة')}
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
 function metaGet(){return{site:$('mSite').value,notes:$('mNotes').value,gps:$('mGps').dataset.v||''}}
 function metaSave(){try{localStorage.setItem('cave-meta',JSON.stringify(metaGet()))}catch(e){}}
@@ -1184,6 +1200,17 @@ function gridSpikes(){if(isComp()||!D)return;const bad=[];D.forEach((row,i)=>row
  const m=bad.length?'⚠ خلايا معزولة (سوء تلامس محتمل): '+bad.slice(0,5).join('، ')+' — أعد قياسها':'';if(m&&m!==lastGW)qWarn(m);lastGW=m}
 if(typeof window.refresh==='function'){const _rf3=window.refresh;window.refresh=function(...a){const r=_rf3.apply(this,a);try{gridSpikes()}catch(e){}return r}}
 window.addEventListener('load',()=>{try{calShow()}catch(e){}});
+/* ---------- فحص تلامس الأقطاب (CONTACTS|M_R=1|S_R=0 أو CT|M=1|S=0) ---------- */
+const CTN={M:'القطب الرئيسي (ر ر)',M_R:'القطب الرئيسي (ر ر)',M_F:'شعبة الفحص (ر ف)',S:'القطب الفرعي (ف ر)',S_R:'القطب الفرعي (ف ر)',S_F:'شعبة الفحص (ف ف)'};
+let CT_BAD=false,ctPrev=null;
+function okBar(m){let b=$('okBar');if(!b){b=document.createElement('div');b.id='okBar';b.style.cssText='position:sticky;top:0;z-index:97;background:#2e9e5b;color:#fff;text-align:center;padding:10px;font-weight:700';document.body.insertBefore(b,document.body.firstChild)}
+ b.textContent=m;b.style.display='';clearTimeout(b._t);b._t=setTimeout(()=>{b.style.display='none'},4000)}
+function ctLine(line){const bad=[],ok=[];String(line).trim().split('|').slice(1).forEach(p=>{const m=p.trim().toUpperCase().match(/^([A-Z_]+)=([01])$/);if(m)(m[2]==='1'?ok:bad).push(CTN[m[1]]||m[1])});
+ if(!ok.length&&!bad.length)return;const key=bad.join(',');CT_BAD=bad.length>0;
+ const q=$('qBar');
+ if(CT_BAD){if(key!==ctPrev)qWarn('⚠ تحذير: '+bad.join(' و ')+' غير متصل جيداً — أعد غرسه قبل القياس')}
+ else{if(q)q.style.display='none';if(ctPrev!==''&&ctPrev!==null||ctPrev===null)okBar('✓ جميع الأقطاب جاهزة')}
+ ctPrev=key}
 /* اقتران أول مرة: يحتاج لمسة من المستخدم (قيد المتصفح) */
 async function connectInput(){
  if(!navigator.bluetooth){status('Web Bluetooth غير متاح: استخدم Chrome أو Edge وصفحة HTTPS (لا يعمل على Safari/iPhone).');return}
