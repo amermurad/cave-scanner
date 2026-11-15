@@ -139,6 +139,8 @@ textarea{resize:vertical}
   <p class="hint" id="cHint" style="display:none"></p>
   <div class="fl"><table id="tin"></table><div id="cin" style="display:none"></div></div>
   <button class="p" onclick="run()">معالجة وعرض الخريطة</button>
+    <button onclick="qcRun()">🩺 فحص جودة المسح</button>
+    <div id="qrep" class="hint"></div>
 </section>
 
 <section class="pn" id="p1">
@@ -184,6 +186,8 @@ textarea{resize:vertical}
       <label>الارتفاع/العرض <input class="num" id="hr" type="text" inputmode="decimal" value="0.6" oninput="changed()"></label>
       <label>هامش عدم اليقين % <input class="num" id="ut" type="text" inputmode="decimal" value="30" oninput="changed()"></label>
       <label>أقل شذوذ يُعدّ كهفاً % <input class="num" id="minan" type="text" inputmode="decimal" value="5" oninput="changed()"></label>
+      <button class="w2" onclick="resetAnalysis()">↺ استعادة إعدادات التحليل الافتراضية (دون مسح القراءات)</button>
+      <label class="chk w2"><input type="checkbox" id="devAn" onchange="try{localStorage.setItem('cave-devan',this.checked?'1':'0')}catch(e){}"> الجهاز يتحكم بإعدادات التحليل (نوع الشذوذ، العتبة، طرح المدار الأول، قمة بدائرة)</label>
       <label>طول الخط L (م) <input class="num" id="ll" type="text" inputmode="decimal" value="10" oninput="changed()"></label>
       <label>مدى الاستقصاء α <input class="num" id="al" type="text" inputmode="decimal" value="0.4" oninput="changed()"></label>
     </div>
@@ -233,6 +237,8 @@ textarea{resize:vertical}
       <div class="w2 hint" style="margin-top:6px"><b>تحكم بالجهاز</b></div>
       <button class="w2" onclick="sendCmd('TRIGGER')">📏 قياس الآن</button>
       <button class="w2" onclick="sendCmd('RESET')">⟲ إعادة المؤشر في الجهاز</button>
+      <button class="w2" onclick="fullReset()">🗑 مسح كل القراءات وإعادة المؤشر (التطبيق + الجهاز)</button>
+      <div class="w2 hint">على الجهاز: ضغطة مطوّلة على زر العيّنة = إعادة مؤشر الجهاز فقط، وضغطة مطوّلة ثانية خلال 5 ثوانٍ (3 نغمات) = مسح قراءات التطبيق أيضاً. تُحفظ نسخة احتياطية تلقائياً قبل المسح.</div>
       <button class="w2" onclick="sendDims()">⇪ إرسال الأبعاد/النمط للجهاز</button>
       <button class="w2" onclick="undoLast()">↶ تراجع عن آخر قراءة</button>
       <div class="w2 hint" style="margin-top:6px"><b>بيانات المسح</b></div>
@@ -264,6 +270,8 @@ textarea{resize:vertical}
     </div>
     <h3>المسوح المحفوظة</h3>
     <div id="lib"></div>
+    <h3>🛟 نسخ احتياطية تلقائية</h3>
+    <div id="bkList"></div>
     <h3>تصدير واستيراد</h3>
     <div class="sg">
       <button onclick="exportFile()">تنزيل ملف JSON</button>
@@ -287,7 +295,7 @@ textarea{resize:vertical}
   <button onclick="setTab(4)"><i>💾</i>الحفظ</button>
 </nav>
 <footer>جميع حقوق الحماية محفوظة © Murad Hasan Alhasheesh 2024</footer>
-<div style="text-align:center;font-size:10px;opacity:.55;padding:2px 0 6px">نسخة الإصلاح: سطر/عمود + حدّ الشذوذ + تبديل النمط (14-11-2026)</div>
+<div style="text-align:center;font-size:10px;opacity:.55;padding:2px 0 6px">نسخة 8: حماية البيانات + نسخ احتياطية تلقائية + فحص الجودة + إصلاحات الشبكة والفرجار (14-11-2026)</div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -447,11 +455,11 @@ $('cv').addEventListener('pointermove',pick);$('cv').addEventListener('pointerdo
 
 /* ---------- تحليل الكهف: طريقة الخطوط المتقاطعة ---------- */
 function minAn(){const v=num($('minan'));return(v===null||!(v>=0)?5:v)/100}
-function lineProfile(vals,hiT){
+function lineProfile(vals,hiT,few){
  const v=vals.filter(x=>x!==null);if(v.length<3)return null;
  const med=a=>{a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2};
  /* الخلفية = وسيط النصف «الهادئ» من الخطوط (الأخفض للفراغ الهوائي، الأعلى للماء/الطين) كي لا يفسدها كهف عريض */
- const q=[...v].sort((p,r)=>hiT?p-r:r-p).slice(0,Math.ceil(v.length/2)),bg=med(q),sig=1.4826*med(q.map(x=>Math.abs(x-bg)));
+ const q=[...v].sort((p,r)=>hiT?p-r:r-p).slice(0,Math.ceil(v.length/2)),fw=!!few&&v.length<6,bg=fw?med(v):med(q),sig=fw?0:1.4826*med(q.map(x=>Math.abs(x-bg)));
  const s=vals.map(x=>x===null?0:Math.max(0,hiT?x-bg:bg-x)),mx=Math.max(...s);
  if(!(mx>0)||mx<Math.max(3*sig,minAn()*Math.abs(bg)))return null;
  return{s,bg,mx,n:s.map(x=>x/mx)}}
@@ -732,7 +740,7 @@ function analyzeC(){
  TG=[];MASK=null;CID=null;DEV=null;
  const hiT=atypeEff()==='high',fr=$('thr').value/100,kk=num($('kd'))||1,rr=num($('hr'))||.6,ut=Math.max(0,num($('ut'))??30)/100,al=num($('al'))||.4,dir=$('cdir').value==='ccw'?-1:1;
  const K=CRAD.length,stp=K>1?CRAD[1]-CRAD[0]:CRAD[0],Rm=CRAD[K-1]+stp/2,as=num($('cas'))||1;
- const prof=CRAW.map(a=>lineProfile(a,hiT));CDIAG={rings:prof.map((p,k)=>p?k+1:0).filter(Boolean),runs:0,single:0,hiT};
+ const prof=CRAW.map(a=>lineProfile(a,hiT,true));CDIAG={rings:prof.map((p,k)=>p?k+1:0).filter(Boolean),runs:0,single:0,hiT};
  CNORM=CRAW.map((a,k)=>a.map((x,m)=>x===null?null:(prof[k]?prof[k].n[m]:0)));
  lo=0;hi=1;UN='';
  const ad=(a,b)=>Math.abs(((a-b+540)%360)-180),tracks=[];
@@ -764,7 +772,12 @@ function cfield(east,north){
  for(const [k,wk] of [[k0,1-fk],[k1,fk]]){if(wk<=0)continue;const N=CN[k],f=th/360*N,m0=Math.floor(f)%N,m1=(m0+1)%N,fa=sm(f-Math.floor(f));
   for(const [m,wa] of [[m0,1-fa],[m1,fa]]){const x=CNORM[k][m];if(x===null)continue;const w=wk*wa;sw+=w;sv+=w*x}}
  SW=sw;SV=sw>0?sv/sw:0;return true}
-function drawC(){analyzeC();buildCTable();mapC();build3C();showTG();setMV(mv);if(tab===2)r3()}
+function drawC(){analyzeC();
+ /* إن ألغى «طرح المدار الأول» الإشارة (الدائرتان الأولى والثانية متشابهتان) نُعيد التحليل على القراءات الخام بدل ترك الرسم فارغاً */
+ if(!TG.length&&$('csub')&&$('csub').checked&&CRAD.length>1&&CRAW_RAW&&CRAW!==CRAW_RAW){const net=CRAW;CRAW=CRAW_RAW;analyzeC();
+  if(TG.length)TG.forEach(t=>t.notes.push('⚠ حُلّل دون طرح المدار الأول لأن الطرح ألغى الإشارة (قراءات الدائرة الأولى والثانية متشابهة)'));
+  else{CRAW=net;analyzeC()}}
+ buildCTable();mapC();build3C();showTG();if(!TG.length){const inf=$('info');if(inf)inf.textContent=noTGmsg()}setMV(mv);if(tab===2)r3()}
 function infoC(k,m){const x=CRAW[k][m];$('info').textContent=`نق ${CRAD[k].toFixed(1)} م · ${(360*m/CN[k]).toFixed(0)}° : `+(x===null?'بلا قراءة':`${(CRAW_RAW&&CRAW_RAW[k][m]!==x)?CRAW_RAW[k][m]+' ← صافي '+x:x}  (شذوذ نسبي ${CNORM[k][m].toFixed(2)})`)}
 function buildCTable(){
  const el=$('cres');el.innerHTML='';
@@ -965,13 +978,16 @@ function placeSequentialPair(h,v){
  return a||b}
 /* ---------- تحكم الجهاز (ESP32) بالتطبيق: أسطر CFG|مفتاح|قيمة و CMD|أمر|قيمة ---------- */
 const DEV_CFG={ROWS:'rows',COLS:'cols',DX:'dx',DY:'dy',R0:'cr0',RINGS:'cnr',SAMPLES:'cns',ARC:'cas',DIR:'cdir',ATYPE:'atype',THR:'thr',K:'kd',HR:'hr',AL:'al',UT:'ut'};
-const DEV_CHK={SUB:'csub',ONE:'one'};
+const DEV_CHK={SUB:'csub',ONE:'one'},DEV_AN=['ATYPE','THR','K','HR','AL','UT','SUB','ONE'];
+function devAnOn(){try{return localStorage.getItem('cave-devan')==='1'}catch(e){return false}}
+window.addEventListener('load',()=>{const c=$('devAn');if(c)c.checked=devAnOn()});
 function devSilent(fn){const oc=window.confirm,oa=window.alert;window.confirm=()=>true;window.alert=m=>status('الجهاز: '+m);const rb=rxBuffer;devApplying=true;try{fn()}finally{devApplying=false;rxBuffer=rb;window.confirm=oc;window.alert=oa}}
 function devCommand(kind,key,val){
  try{
   if(kind==='CFG'){
    if(key==='MODE'){setSM(/^compass$/i.test(val)?'compass':'grid');status('الجهاز: وضع '+(/^compass$/i.test(val)?'الفرجار':'الشبكة'));return}
-   if(DEV_CHK[key]){const e=$(DEV_CHK[key]);if(!e)return;e.checked=(val==='1'||/^(on|true)$/i.test(val));e.dispatchEvent(new Event('change',{bubbles:true}));status('الجهاز: '+key+'='+val);return}
+   if(DEV_AN.includes(key)&&!devAnOn()){status('إعدادات التحليل تبقى كما في التطبيق (تجاهلت '+key+' من الجهاز)');return}
+    if(DEV_CHK[key]){const e=$(DEV_CHK[key]);if(!e)return;e.checked=(val==='1'||/^(on|true)$/i.test(val));e.dispatchEvent(new Event('change',{bubbles:true}));status('الجهاز: '+key+'='+val);return}
    if(key==='ATYPE'&&$('atype').value==='all')return;const id=DEV_CFG[key];const e=id&&$(id);if(!e){status('إعداد غير معروف من الجهاز: '+key);return}
    if(e.tagName==='SELECT'){const ok=[...e.options].some(o=>o.value===val.toLowerCase());if(!ok){status('قيمة غير صالحة من الجهاز: '+key+'='+val);return}e.value=val.toLowerCase();e.dispatchEvent(new Event('change',{bubbles:true}))}
    else{e.value=val;e.dispatchEvent(new Event('input',{bubbles:true}))}
@@ -989,15 +1005,14 @@ function consumeLine(line){
  line=String(line).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫]/g,'.').replace(/[−–]/g,'-').replace(/[;\t]/g,',').trim();
  if(!line)return;
  const stm=line.match(/^STATUS\s*[|,:]\s*(.*)$/i);
- if(stm){const nm={ERROR_TIMEOUT:'انتهت مهلة القياس — مقاومة عالية جداً أو قطب غير متصل',BLE_CONNECTED:'الجهاز متصل',READY:'الجهاز جاهز'}[stm[1].trim().toUpperCase()];status(nm||('الجهاز: '+stm[1]));return}
+ if(stm){const nm={ERROR_TIMEOUT:'انتهت مهلة القياس — مقاومة عالية جداً أو قطب غير متصل',BLE_CONNECTED:'الجهاز متصل',READY:'الجهاز جاهز',HIGH_R:'مقاومة التربة أعلى من حدّ دقة الجهاز — حسّن التلامس أو بلّل التربة حول القطب'}[stm[1].trim().toUpperCase()];status(nm||('الجهاز: '+stm[1]));return}
  const dv=line.match(/^(CFG|CMD)\s*\|\s*([A-Za-z0-9_]+)\s*(?:\|\s*(.*))?$/i);
  if(dv){devCommand(dv[1].toUpperCase(),dv[2].toUpperCase(),(dv[3]||'').trim());return}
  if(/^(CONTACTS|CT)\|/i.test(line)){ctLine(line);return}
- if(/^(ROW|COL),/i.test(line)){if(isComp()){setSM('grid');status('تحوّل التطبيق إلى وضع الشبكة لأن الجهاز يرسل قراءات شبكة')}rcLine(line);return}
+ if(/^(ROW|COL),/i.test(line)){if(isComp()){status('⚠ الجهاز يرسل قراءات شبكة والتطبيق في وضع الفرجار — بدّل النمط في الجهاز أو في التطبيق');return}rcLine(line);return}
  if($('dataFormat').value==='auto'&&/^ROWS_DONE$/i.test(line.trim())){status('انتهت مرحلة الأسطر (H) — ابدأ الآن بالأعمدة (V)');return}
  if($('dataFormat').value==='auto'&&/^COLS_DONE$/i.test(line.trim())){status('✓ اكتملت دورة المسح: H و V');return}
- if(/^(R[\s,]|RING_BEGIN|RING_DONE)/i.test(line)){if(!isComp()){setSM('compass');status('تحوّل التطبيق إلى وضع الفرجار لأن الجهاز يرسل قراءات فرجار')}ringLine(line);return}
- if(isComp()&&/^([HV][\s,]|\d+[\s,]\d+[\s,])/i.test(line)){setSM('grid');status('تحوّل التطبيق إلى وضع الشبكة لأن الجهاز يرسل قراءات شبكة')}
+ if(/^(R[\s,]|RING_BEGIN|RING_DONE)/i.test(line)){ringLine(line);return}
  const fmt=$('dataFormat').value;let ok=false;
  if(fmt==='rings'){ringLine(line);return}
  if(fmt==='rowColPhases'){
@@ -1036,7 +1051,7 @@ function consumeLine(line){
 }
 let rxBytes=0,rxLogA=[];
 function logRx(l){rxLogA.push(l);if(rxLogA.length>14)rxLogA.shift();const e=$('rxLog');if(e){e.textContent=rxLogA.join('\n');e.scrollTop=e.scrollHeight}}
-function feedData(chunk){rxBytes+=chunk.length;const c=$('rxCnt');if(c)c.textContent='الوارد من الجهاز: '+rxBytes+' بايت';rxBuffer+=chunk;let lines=rxBuffer.split(/\r?\n/);rxBuffer=lines.pop().slice(-500);lines.forEach(l=>{logRx(l);consumeLine(l)})}
+function feedData(chunk){rxBytes+=chunk.length;const c=$('rxCnt');if(c)c.textContent='الوارد من الجهاز: '+rxBytes+' بايت';rxBuffer+=chunk;let lines=rxBuffer.split(/\r?\n/);rxBuffer=lines.pop().slice(-500);if(lines.length>400){status('⚠ وارد كثيف من الجهاز: تجاهلت '+(lines.length-400)+' سطراً قديماً');lines=lines.slice(-400)}lines.forEach(l=>{logRx(l);consumeLine(l)})}
 function setConnectedUI(on){
  const pb=$('pairBar');if(pb)pb.style.display=on||!navigator.bluetooth?'none':(bleDevice?'none':'');
  $('connectBtn').style.display=on?'none':'';
@@ -1099,7 +1114,11 @@ function rcLine(line){
   if(!el||w.dataset.off||el.value.trim()!=='')continue;
   HIST.push([el,el.value,g]);el.value=String(x);w.classList.remove('off');w.dataset.off='';n++}
  if(HIST.length>600)HIST.splice(0,HIST.length-600);
- changed();status((isRow?'السطر '+idx+' (H)':'العمود '+idx+' (V)')+': '+x+' ← '+n+' خلية')}
+ changed();
+ const dn=(isH)=>{let c=0;for(let a=0;a<(isH?R:C);a++){let ok=true;for(let b=0;b<(isH?C:R);b++){const i=isH?a:b,j=isH?b:a,w=$('w'+i+'_'+j);if(w&&w.dataset.off)continue;if($((isH?'h':'v')+i+'_'+j).value.trim()===''){ok=false;break}}if(ok)c++}return c};
+ const rdn=dn(true),cdn=dn(false);
+ if(!n){status('⚠ '+(isRow?'السطر '+idx:'العمود '+idx)+' مملوء بالفعل — أُهملت القراءة (امسح قيمه لإعادة قياسه)');return}
+ status((isRow?'السطر '+idx+' (H)':'العمود '+idx+' (V)')+': '+x+' ← '+n+' خلية · الأسطر '+rdn+'/'+R+' · الأعمدة '+cdn+'/'+C+(rdn===R&&cdn<C?' — الآن ابدأ الأعمدة':'')+(rdn===R&&cdn===C?' — ✓ اكتمل المسح، اضغط «معالجة»':''))}
 function undoLast(){const h=HIST.pop();if(!h){status('لا توجد قراءة للتراجع ');return}h[0].value=h[1];if(h[2]){while(HIST.length&&HIST[HIST.length-1][2]===h[2]){const q=HIST.pop();q[0].value=q[1]}document.querySelectorAll('.hv').forEach(w=>{const i=w.id.slice(1);const a=$('h'+i),b=$('v'+i);if(a&&b&&a.value.trim()===''&&b.value.trim()===''){w.classList.add('off');w.dataset.off=1}});changed();status('تم التراجع عن آخر سطر/عمود');return}if($('dataFormat').value!=='auto'&&seqIndex>0)seqIndex--;changed();status('تم التراجع عن آخر قراءة')}
 function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
 function metaGet(){return{site:$('mSite').value,notes:$('mNotes').value,gps:$('mGps').dataset.v||''}}
@@ -1111,7 +1130,7 @@ function getGps(){if(!navigator.geolocation){status('GPS غير متاح');retur
 function exportJSON(){save();metaSave();const o={app:'cave-survey',ver:1,date:new Date().toISOString(),meta:metaGet(),data:localStorage.getItem(KEY),lib:localStorage.getItem(LIB)};
  dl('cave_'+((o.meta.site||'survey').replace(/[^\w\u0600-\u06FF]+/g,'_'))+'_'+o.date.slice(0,10)+'.json',JSON.stringify(o),'application/json');status('تم تصدير النسخة')}
 function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
- r.onload=()=>{try{const o=JSON.parse(r.result);if(o.app!=='cave-survey'||!o.data)throw Error('ملف غير صالح');localStorage.setItem(KEY,o.data);if(o.lib)localStorage.setItem(LIB,o.lib);localStorage.setItem('cave-meta',JSON.stringify(o.meta||{}));location.reload()}catch(e){status('فشل الاستيراد: '+e.message)}};r.readAsText(f)}
+ r.onload=()=>{try{const o=JSON.parse(r.result);if(o.app!=='cave-survey'||!o.data)throw Error('ملف غير صالح');const dd=JSON.parse(o.data);if(!dd||!Number.isInteger(dd.R)||!Number.isInteger(dd.C)||dd.R<2||dd.R>40||dd.C<2||dd.C>40||!Array.isArray(dd.h)||!Array.isArray(dd.v))throw Error('بيانات الملف تالفة');if(o.lib&&!Array.isArray(JSON.parse(o.lib)))throw Error('قائمة المسوح في الملف تالفة');localStorage.setItem(KEY,o.data);if(o.lib)localStorage.setItem(LIB,o.lib);localStorage.setItem('cave-meta',JSON.stringify(o.meta||{}));location.reload()}catch(e){status('فشل الاستيراد: '+e.message)}};r.readAsText(f)}
 function exportCSV(){const c=isComp();if(c?!CRAW:!D){status('لا توجد نتائج محسوبة بعد');return}
  const t=c?(CRAW_RAW||CRAW).map((r,k)=>CRAD[k].toFixed(2)+','+r.map(x=>x===null?'':x).join(',')).join('\n'):D.map(r=>r.map(x=>x===null?'':x.toFixed(3)).join(',')).join('\n');
  dl('cave_results.csv','\ufeff'+t,'text/csv')}
@@ -1262,14 +1281,94 @@ function copyCSV(){if(isComp()?!CRAW:!D)return;const t=isComp()?(CRAW_RAW||CRAW)
  const say=s=>$('cp').textContent=s;try{navigator.clipboard.writeText(t).then(()=>say('تم النسخ'),()=>say('تعذر النسخ في هذا المتصفح'))}catch(e){say('تعذر النسخ في هذا المتصفح')}}
 function save(){try{const g=k=>Array.from({length:R},(_,i)=>Array.from({length:C},(_,j)=>$(k+i+'_'+j).value));
  localStorage.setItem(KEY,JSON.stringify({R,C,h:g('h'),v:g('v'),m:$('metric').value,c:$('cmap').value,p:$('clip').checked,q:SET.map(k=>$(k).value),o:$('shw').checked,g:$('ghost').value,cp:cvals()}))}catch(e){}}
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s)return;
- R=s.R;C=s.C;$('rows').value=R;$('cols').value=C;build();
- for(let i=0;i<R;i++)for(let j=0;j<C;j++){const h=$('h'+i+'_'+j),v=$('v'+i+'_'+j);h.value=s.h[i][j];v.value=s.v[i][j];
-  if(h.value===''&&v.value===''){const w=$('w'+i+'_'+j);w.classList.add('off');w.dataset.off=1}}
- $('metric').value=s.m||'m';if(!$('metric').value)$('metric').value='m';$('cmap').value=s.c;$('clip').checked=!!s.p;
- if(s.q){SET.forEach((k,n)=>{if(s.q[n]!==undefined)$(k).value=s.q[n]});$('thv').textContent=$('thr').value+'%';$('shw').checked=s.o!==false}$('ghost').value=s.g||'off';buildC();if(s.cp)fillC(s.cp);setSM($('smode').value);return true}catch(e){}}
+function load(){const raw=(()=>{try{return localStorage.getItem(KEY)}catch(e){return null}})();
+ const quarantine=()=>{try{if(raw)localStorage.setItem(KEY+'-bad',raw);localStorage.removeItem(KEY)}catch(e){}R=5;C=5;D=null;try{$('rows').value=5;$('cols').value=5}catch(e){}};
+ try{const s=JSON.parse(raw||'null');if(!s)return;
+  const okD=n=>Number.isInteger(n)&&n>=2&&n<=40;
+  if(typeof s!=='object'||!okD(s.R)||!okD(s.C)||!Array.isArray(s.h)||!Array.isArray(s.v)){quarantine();return}
+  const setS=(el,v)=>{if(!el||v===undefined||v===null)return;if(el.tagName==='SELECT'&&![...el.options].some(o=>o.value===String(v)))return;el.value=v};
+  R=s.R;C=s.C;$('rows').value=R;$('cols').value=C;build();
+  for(let i=0;i<R;i++)for(let j=0;j<C;j++){const h=$('h'+i+'_'+j),v=$('v'+i+'_'+j);h.value=(s.h[i]&&s.h[i][j]!=null)?String(s.h[i][j]):'';v.value=(s.v[i]&&s.v[i][j]!=null)?String(s.v[i][j]):'';
+   if(h.value===''&&v.value===''){const w=$('w'+i+'_'+j);w.classList.add('off');w.dataset.off=1}}
+  setS($('metric'),s.m);if(!$('metric').value)$('metric').value='m';setS($('cmap'),s.c);$('clip').checked=!!s.p;
+  if(Array.isArray(s.q)){SET.forEach((k,n)=>{if(s.q[n]!==undefined)setS($(k),s.q[n])});$('thv').textContent=$('thr').value+'%';$('shw').checked=s.o!==false}setS($('ghost'),s.g||'off');if(!$('ghost').value)$('ghost').value='off';
+  buildC();if(Array.isArray(s.cp))fillC(s.cp);setSM($('smode').value);return true}catch(e){quarantine()}}
 try{$('csub').checked=localStorage.getItem('cave-csub')!=='0'}catch(e){}try{$('one').checked=localStorage.getItem('cave-one')!=='0'}catch(e){}try{const v=localStorage.getItem('cave-ts');if(v)$('ts').value=v}catch(e){}applyTS();try{const w=localStorage.getItem('cave-cview');if(w)$('cview').value=w}catch(e){}if(!load())build();if(!CRAD.length)buildC();setSM($('smode').value);arrUI();inputTypeChanged();renderLib();
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+/* ===================== نسخة 8: حماية وأدوات استخدام ===================== */
+/* سجل أخطاء غير متوقعة (لا يوقف التطبيق) */
+const ERRLOG=[];
+window.addEventListener('error',e=>{ERRLOG.push(String(e.message||'')+' @'+(e.lineno||''));if(ERRLOG.length>20)ERRLOG.shift();try{status('⚠ خطأ غير متوقع: '+String(e.message||'').slice(0,80)+' — القراءات محفوظة تلقائياً')}catch(x){}});
+window.addEventListener('unhandledrejection',e=>{ERRLOG.push('promise: '+String(e.reason&&e.reason.message||e.reason||'').slice(0,100));if(ERRLOG.length>20)ERRLOG.shift()});
+
+/* ---- نسخ احتياطية تلقائية قبل أي إجراء قد يمسح القراءات ---- */
+const BKK='cave-backup-v1';
+function bkGet(){try{const a=JSON.parse(localStorage.getItem(BKK)||'[]');return Array.isArray(a)?a.filter(e=>e&&e.snap&&typeof e.t==='number'&&Number.isInteger(e.snap.R)&&Number.isInteger(e.snap.C)&&Array.isArray(e.snap.h)&&Array.isArray(e.snap.v)):[]}catch(e){return[]}}
+function bkSnap(){const g=k=>Array.from({length:R},(_,i)=>Array.from({length:C},(_,j)=>{const el=$(k+i+'_'+j);return el?el.value:''})),st={};
+ SKEYS.forEach(k=>{const el=$(k);if(el)st[k]=CHK.includes(k)?el.checked:el.value});
+ return{format:'cave-survey',version:2,savedAt:new Date().toISOString(),name:($('surveyName').value||'').trim()||'نسخة احتياطية',notes:$('surveyNotes').value,R,C,h:g('h'),v:g('v'),settings:st,compass:{rings:cvals()}}}
+function bkCount(s){let n=0;s.h.forEach((r,i)=>r.forEach((x,j)=>{if((x!==''&&x!=null)||(s.v[i]&&s.v[i][j]!==''&&s.v[i][j]!=null))n++}));
+ if(s.compass&&Array.isArray(s.compass.rings))s.compass.rings.forEach(r=>{if(Array.isArray(r))r.forEach(x=>{if(x!==''&&x!=null)n++})});return n}
+function bkPush(why){try{if(!hasAnyReading()&&!hasAnyC())return;const s=bkSnap();if(!bkCount(s))return;const a=bkGet(),sig=JSON.stringify([s.h,s.v,s.compass,s.settings.smode]);
+ if(a.length&&JSON.stringify([a[0].snap.h,a[0].snap.v,a[0].snap.compass,a[0].snap.settings&&a[0].snap.settings.smode])===sig)return;
+ a.unshift({t:Date.now(),why:why||'',n:bkCount(s),snap:s});while(a.length>8)a.pop();
+ try{localStorage.setItem(BKK,JSON.stringify(a))}catch(e){a.length=Math.min(a.length,3);try{localStorage.setItem(BKK,JSON.stringify(a))}catch(x){}}
+ bkRender()}catch(e){}}
+function bkRender(){const el=$('bkList');if(!el)return;const a=bkGet();
+ if(!a.length){el.innerHTML='<p class="hint">لا توجد نسخ بعد. تُحفظ نسخة تلقائياً قبل أي مسح أو تغيير أبعاد أو استيراد.</p>';return}
+ el.innerHTML=a.map((e,i)=>`<div class="li"><b>${esc(new Date(e.t).toLocaleString('ar'))}</b><small>${esc(e.why||'')} · ${e.n} قراءة · ${(e.snap.settings&&e.snap.settings.smode==='compass')?'فرجار':e.snap.R+'×'+e.snap.C}</small><div class="row" style="justify-content:flex-start;margin-top:6px"><button class="chip" onclick="bkRestore(${i})">↩ استرجاع</button></div></div>`).join('')}
+function bkRestore(i){const e=bkGet()[i];if(!e)return;bkPush('قبل الاسترجاع');try{if(applySnapshot(e.snap))msg('✓ تم استرجاع النسخة')}catch(x){msg('تعذر الاسترجاع: '+x.message)}}
+[['clearAll','قبل مسح الشبكة'],['clearC','قبل مسح الفرجار'],['applyDims','قبل تغيير أبعاد الشبكة'],['applyC','قبل تغيير إعداد الفرجار'],['newSurvey','قبل مسح جديد'],['applySnapshot','قبل فتح/استيراد مسح'],['importJSON','قبل استيراد نسخة كاملة']].forEach(([n,w])=>{const f=window[n];if(typeof f!=='function')return;window[n]=function(){bkPush(w);return f.apply(this,arguments)}});
+window.addEventListener('load',()=>{try{bkRender()}catch(e){}});
+
+/* ---- استعادة إعدادات التحليل الافتراضية دون مسح القراءات ---- */
+function resetAnalysis(){if(!confirm('إعادة إعدادات التحليل (نوع الشذوذ، العتبة، العمق، حدّ الشذوذ…) إلى الافتراضي؟ القراءات لن تُمسّ.'))return;
+ ['atype','thr','kd','hr','ut','al','ll','amode','minan','metric','ghost'].forEach(id=>{const e=$(id);if(!e)return;if(e.tagName==='SELECT'){const o=[...e.options].find(o=>o.defaultSelected)||e.options[0];if(o)e.value=o.value}else e.value=e.defaultValue});
+ ['csub','one'].forEach(id=>{const e=$(id);if(e)e.checked=e.defaultChecked});const d=$('devAn');if(d){d.checked=false;try{localStorage.setItem('cave-devan','0')}catch(x){}}
+ $('thv').textContent=$('thr').value+'%';changed();status('✓ أُعيدت إعدادات التحليل الافتراضية')}
+
+/* ---- فحص جودة المسح: يلتقط الأخطاء الشائعة قبل أن تضيّع وقتك ---- */
+function qcItems(){const out=[],add=(l,t)=>out.push({l,t});
+ const rd=el=>{if(!el)return null;const s=String(el.value).trim();if(s==='')return null;const x=num(el);return x===null?NaN:x};
+ const med=a=>{a=[...a].sort((p,q)=>p-q);return a.length?a[Math.floor((a.length-1)/2)]:NaN};
+ if(!isComp()){
+  const H=[],V=[],M=[];let missH=0,missV=0,bad=0,neg=0,cells=0;
+  for(let i=0;i<R;i++)for(let j=0;j<C;j++){const w=$('w'+i+'_'+j);if(w&&w.dataset.off)continue;cells++;const h=rd($('h'+i+'_'+j)),v=rd($('v'+i+'_'+j));
+   if(h===null)missH++;else if(Number.isNaN(h))bad++;else{H.push(h);if(h<=0)neg++}
+   if(v===null)missV++;else if(Number.isNaN(v))bad++;else{V.push(v);if(v<=0)neg++}
+   if(h!==null&&v!==null&&Number.isFinite(h)&&Number.isFinite(v))M.push(Math.hypot(h,v))}
+  if(!H.length&&!V.length){add('bad','لا توجد قراءات في الشبكة بعد.');return out}
+  if(bad)add('bad','يوجد '+bad+' حقل غير رقمي (حروف أو رموز) — صحّحه أو امسحه.');
+  if(neg)add('warn','يوجد '+neg+' قراءة صفر أو سالبة — المقاومة لا تكون كذلك، أعد قياسها.');
+  if(missH||missV)add('warn','ناقص: H في '+missH+' خلية، V في '+missV+' خلية من '+cells+' — الخلايا الناقصة تُحسب بالتقدير أو تُهمل.');
+  if(H.length&&V.length){const r=med(H)/med(V);if(r>3||r<1/3)add('warn','وسيط H يختلف عن V بنسبة '+(r>1?r:1/r).toFixed(1)+'× — تحقق من توصيل الأقطاب أو من تبديل قناتي H وV.')}
+  const all=H.concat(V),m=med(all);
+  if(all.length>=6&&m>0){const wild=all.filter(x=>x>m*5||x<m/5).length;if(wild)add('warn',wild+' قراءة تختلف عن الوسيط أكثر من 5 أضعاف — سوء تلامس محتمل (أو هدف قوي جداً)، أعد قياسها للتأكد.')}
+  if(M.length>=4){const mn=Math.min(...M),mx=Math.max(...M),mu=M.reduce((a,b)=>a+b,0)/M.length,pc=(mx-mn)/Math.abs(mu||1)*100;
+   if(pc<minAn()*100)add('info','الأرض متجانسة: الفرق بين أعلى وأدنى قراءة '+pc.toFixed(2)+'% فقط (حد الشذوذ '+(minAn()*100).toFixed(1)+'%) — لا يُتوقع ظهور كهف.')}
+  if(all.length>=6&&new Set(all).size===1)add('warn','كل القراءات متطابقة تماماً — تحقق أن الجهاز يقيس فعلاً.');
+  if(cells<9)add('info','الشبكة صغيرة ('+R+'×'+C+'): دقة الكشف محدودة، والأفضل 5×5 فأكثر.');
+ }else{
+  let any=0,miss=0;const ringsInfo=[];
+  CRAD.forEach((r,k)=>{const vals=[];for(let m=0;m<CN[k];m++){const x=rd($('c'+k+'_'+m));if(x===null)miss++;else if(Number.isNaN(x))add('bad','حقل غير رقمي في الدائرة '+(k+1)+'.');else{vals.push(x);any++;if(x<=0)add('warn','قراءة صفر أو سالبة في الدائرة '+(k+1)+' — أعد قياسها.')}}
+   ringInfo(ringsInfo,k,vals)});
+  if(!any){add('bad','لا توجد قراءات فرجار بعد.');return out}
+  if(miss)add('warn','ينقص '+miss+' قراءة في الدوائر — الدوائر الناقصة قد لا تُحلَّل.');
+  ringsInfo.forEach(t=>add('info',t));
+  if(CRAD.length>=2&&$('csub')&&$('csub').checked)add('info','«اطرح المدار الأول» مفعّل: إن تشابهت الدائرتان 1 و2 يحلّل التطبيق القراءات الخام تلقائياً.');
+ }
+ if(!out.length)add('ok','لا مشاكل ظاهرة في القراءات.');return out}
+function ringInfo(acc,k,vals){if(vals.length&&vals.length<6)acc.push('الدائرة '+(k+1)+': '+vals.length+' عيّنات فقط — الدقة محدودة (يُنصح بـ 8 فأكثر).');
+ if(vals.length>=3&&new Set(vals).size===1)acc.push('الدائرة '+(k+1)+': كل قراءاتها متطابقة.')}
+function qcRun(){const el=$('qrep');if(!el)return;const ic={ok:'✅',info:'ℹ️',warn:'⚠️',bad:'❌'};
+ el.innerHTML=qcItems().map(x=>`<div style="margin:4px 0;text-align:start">${ic[x.l]||''} ${esc(x.t)}</div>`).join('')}
+(function(){const f=window.run;if(typeof f!=='function')return;window.run=function(){const r=f.apply(this,arguments);try{const b=qcItems().filter(x=>x.l==='bad'||x.l==='warn');if(b.length)qWarn((b[0].l==='bad'?'❌ ':'⚠ ')+b[0].t);qcRun()}catch(e){}return r}})();
+
+
+/* مسح القراءات وإعادة المؤشر معاً — يعمل حتى أثناء الاتصال بالجهاز */
+function fullReset(){if(!confirm('مسح كل قراءات النمط الحالي وإعادة المؤشر في الجهاز إلى البداية؟ (تُحفظ نسخة احتياطية تلقائياً)'))return;
+ devSilent(()=>{if(isComp()){ASK={key:'clear',t:Date.now()};clearC()}else clearAll()});resetRxState();
+ if(isConnected())sendCmd('RESET');else status('✓ مُسحت القراءات')}
 </script>
 </body>
 </html>
