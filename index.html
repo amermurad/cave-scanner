@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>منظومة مسح الكهوف الذكية — Murad Hasan Alhasheesh</title>
 <meta name="author" content="Murad Hasan Alhasheesh">
-<meta name="theme-color" content="#101214">
+<meta name="theme-color" content="#0e1311"><meta name="color-scheme" content="dark light">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -104,6 +104,91 @@ h3{font-size:12px;color:var(--acc);margin:12px 0 6px}
 textarea{resize:vertical}
 .li{background:var(--inp);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px}
 .li b{display:block;font-size:13px}.li small{color:var(--mut);font-size:10px;line-height:1.7}
+/* ===================== نسخة 9: مظهر Material 3 (أندرويد) ===================== */
+:root{--r-s:10px;--r-m:16px;--r-l:24px;--el1:0 1px 2px rgba(0,0,0,.20),0 1px 4px 1px rgba(0,0,0,.08);--el2:0 2px 6px rgba(0,0,0,.26),0 6px 16px 2px rgba(0,0,0,.12);
+ --bg:#0e1311;--panel:#161c19;--panel2:#1d2521;--line:#2b3631;--fg:#e3ebe6;--mut:#9aaba2;--acc:#4be0a4;--inp:#1c2420;--on-acc:#00311d;--h:#4be0a4;--v:#ffc857;
+ --accC:color-mix(in srgb,var(--acc) 22%,var(--panel));--warnC:color-mix(in srgb,#ffb020 16%,var(--panel))}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3f8f5;--panel:#ffffff;--panel2:#ecf3ef;--line:#cdd9d2;--fg:#161d19;--mut:#52625a;--acc:#00875a;--inp:#e7efea;--on-acc:#ffffff;--h:#00875a;--v:#a85f00}}
+:root[data-theme="light"]{--bg:#f3f8f5;--panel:#ffffff;--panel2:#ecf3ef;--line:#cdd9d2;--fg:#161d19;--mut:#52625a;--acc:#00875a;--inp:#e7efea;--on-acc:#ffffff;--h:#00875a;--v:#a85f00}
+body{font-family:Roboto,"Noto Sans Arabic","Noto Naskh Arabic","Segoe UI",system-ui,sans-serif;font-size:14px;-webkit-tap-highlight-color:transparent}
+/* شريط التطبيق العلوي */
+header{position:relative;z-index:3;background:var(--panel);padding:9px 12px 8px;box-shadow:var(--el1)}
+header .ttl{font-size:17px;font-weight:800;color:var(--fg);letter-spacing:.1px}
+header .own{font-size:10px;opacity:.85}
+#pairBar{border-radius:0 0 18px 18px;box-shadow:var(--el2)}
+/* التبويبات */
+.pn{padding:10px 12px;gap:10px}
+.pn.on{animation:pnIn .2s ease-out}
+@keyframes pnIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* شريط التنقل السفلي */
+nav{background:var(--panel2);border:0;box-shadow:0 -1px 0 var(--line);padding:8px 4px 6px;gap:2px}
+nav button{background:none;border-radius:var(--r-m);padding:2px 2px 0;min-height:0;font-size:11.5px;font-weight:600;gap:4px;color:var(--mut)}
+nav button i{font-size:19px;padding:4px 20px;border-radius:999px;line-height:1.1;transition:background .22s,transform .22s}
+nav button.on{box-shadow:none;color:var(--fg)}
+nav button.on i{background:var(--accC);transform:scale(1.04)}
+footer{border-top:0;background:var(--panel2);padding:2px 8px;font-size:10px}
+/* أزرار */
+button{position:relative;overflow:hidden;border:0;border-radius:999px;background:var(--accC);color:var(--fg);padding:9px 16px;min-height:40px;font-weight:700;font-size:13px;transition:background .15s,transform .1s,box-shadow .15s}
+button:active{opacity:1;transform:scale(.97)}
+button.p{background:var(--acc);color:var(--on-acc);border-radius:20px;min-height:54px;font-size:16px;font-weight:800;box-shadow:var(--el2);padding:12px}
+button.tn{flex:none;width:54px;min-height:54px;padding:0;border-radius:20px;font-size:20px;box-shadow:var(--el1)}
+.chip{min-height:32px;padding:5px 12px;font-size:12px;border-radius:10px}.chip.on{background:var(--acc);color:var(--on-acc)}
+.act .pri{background:var(--acc);color:var(--on-acc)}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.22;transform:scale(0);pointer-events:none;animation:rip .55s ease-out forwards}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+/* قطاعات الاختيار */
+.seg{border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;background:var(--panel)}
+.seg button{border-radius:999px;background:transparent;color:var(--mut);padding:9px 6px;min-height:38px}
+.seg button.on{background:var(--accC);color:var(--fg);box-shadow:none}
+.seg button.on::before{content:"✓ ";color:var(--acc);font-weight:800}
+/* حقول */
+.num,select{background:var(--inp);border:1px solid var(--line);border-radius:12px;color:var(--fg)}
+.num{height:38px}select{padding:7px 8px}
+.num:focus,select:focus,.hd:focus,.g:focus,textarea:focus,.sg input:focus{outline:2px solid var(--acc);outline-offset:-1px;border-color:var(--acc)}
+label{font-size:12px;font-weight:600}
+.g,.hd{border-radius:7px}
+.opt .chk{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:7px 12px;font-size:12px;min-height:36px}
+.opt .chk input{accent-color:var(--acc);width:18px;height:18px}
+input[type=checkbox],input[type=range]{accent-color:var(--acc)}
+/* بطاقات */
+.sg{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-l);padding:14px;gap:12px}
+.li{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px}
+.kv{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 6px}
+.kv.k{border-color:var(--acc);background:var(--accC)}
+.kv b{font-size:13px}
+h3{font-size:12.5px;letter-spacing:.3px;color:var(--acc);margin:14px 4px 8px}
+.hint{font-size:11.5px;line-height:1.7}
+#gHint,#cHint{background:var(--panel);border-radius:14px;padding:8px 12px;text-align:start}
+#cHint.cl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;padding:0 12px;border-block:9px solid var(--panel)}
+#qrep:not(:empty){background:var(--panel);border-radius:14px;padding:8px 12px}
+#tg .w,.w{background:var(--warnC);border-radius:8px;padding:2px 8px;display:inline-block;margin:2px 0}
+/* تبويب القراءات: تمرير الصفحة كلها حتى لا يُسحق المخطط */
+#p0{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+#p0>*{flex-shrink:0}
+#p0 .fl{flex:none;overflow:visible}
+#p0 #cin{overflow-x:auto;overflow-y:visible;min-height:min(92vw,440px)}
+#p0 .cir{margin:6px auto 10px}
+.dock{position:sticky;bottom:0;z-index:4;margin:auto -12px 0;padding:10px 12px 8px;display:flex;gap:10px;align-items:stretch;background:linear-gradient(to top,var(--bg) 72%,transparent)}
+.dock .p{flex:1;width:auto}
+/* بطاقة إعداد الفرجار القابلة للطيّ */
+.csum{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:10px 14px;cursor:pointer;min-height:52px}
+.csum .ct{display:flex;flex-direction:column;gap:2px;min-width:0}.csum b{font-size:13.5px}.csum small{color:var(--mut);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csum .chev{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accC);display:flex;align-items:center;justify-content:center;font-size:16px}
+#cSetBody{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:12px;margin-top:-2px}
+#cSetBody.hide{display:none}
+/* الخرائط والمجسم */
+#cv,#ccv{border-radius:var(--r-l)}
+#c3{border-radius:var(--r-l)}
+.bar{height:14px;border-radius:7px}
+#info{background:var(--panel);border-radius:14px;padding:8px 12px;min-height:38px;display:flex;align-items:center;justify-content:center}
+#p2{--ts:.33;--tz:.75;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}#p2 .seg,#p2 #tg,#p2 .row.z{zoom:var(--tz)}
+#p2>*{flex-shrink:0}
+#p2 .fl{flex:none;overflow:hidden;height:clamp(260px,58vh,640px)}
+#tg .w{font-size:11px;padding:1px 8px}
+#gHead{flex-wrap:nowrap;gap:6px}#gHead .num{width:50px}#gHead button{padding:8px 13px;min-height:38px}#gHead button:last-child{padding:8px 12px;min-width:40px}
+@media(min-width:760px){.dock{margin-inline:auto;max-width:620px;width:100%}}
+@media(max-height:620px){button.p{min-height:46px;font-size:15px}button.tn{min-height:46px;width:46px}.dock{padding-top:6px;padding-bottom:6px}nav button i{padding:2px 18px}}
+@media(prefers-reduced-motion:reduce){.pn.on,.ripple{animation:none}nav button i,button{transition:none}}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#101214"><meta name="mobile-web-app-capable" content="yes">
 </head>
@@ -122,6 +207,8 @@ textarea{resize:vertical}
   </div>
   <p class="hint" id="gHint"><span class="b-h">H</span> لكل سطر · <span class="b-v">V</span> لكل عمود · امسح حقلي خلية لاستثنائها · Enter للحقل التالي</p>
   <div class="ch" id="cHead" style="display:none">
+    <div class="csum" id="cSum" onclick="toggleCSet()"><div class="ct"><b>⭕ إعداد الفرجار</b><small id="cSumS"></small></div><span class="chev" id="cChev">⌄</span></div>
+    <div id="cSetBody">
     <div class="cp">
       <label>نق₀ (م)<input class="num" id="cr0" type="text" inputmode="decimal" value="2" title="نصف قطر المدار الأول = الخطوة بين المدارات"></label>
       <label>الدوائر<input class="num" id="cnr" type="text" inputmode="numeric" value="3"></label>
@@ -135,12 +222,12 @@ textarea{resize:vertical}
       <label class="chk">الإدخال <select id="cview" onchange="setCView()"><option value="circle">دائرة</option><option value="rows">سطور</option></select></label>
     </div>
     <div class="act"><button class="pri" onclick="applyC()">تطبيق</button><button onclick="clearC()">مسح</button><button onclick="flipSign()">±</button></div>
+    </div>
   </div>
   <p class="hint" id="cHint" style="display:none"></p>
   <div class="fl"><table id="tin"></table><div id="cin" style="display:none"></div></div>
-  <button class="p" onclick="run()">معالجة وعرض الخريطة</button>
-    <button onclick="qcRun()">🩺 فحص جودة المسح</button>
-    <div id="qrep" class="hint"></div>
+  <div id="qrep" class="hint"></div>
+  <div class="dock"><button class="p" onclick="run()">معالجة وعرض الخريطة</button><button class="tn" onclick="qcRun()" title="فحص جودة المسح" aria-label="فحص جودة المسح">🩺</button></div>
 </section>
 
 <section class="pn" id="p1">
@@ -295,7 +382,7 @@ textarea{resize:vertical}
   <button onclick="setTab(4)"><i>💾</i>الحفظ</button>
 </nav>
 <footer>جميع حقوق الحماية محفوظة © Murad Hasan Alhasheesh 2024</footer>
-<div style="text-align:center;font-size:10px;opacity:.55;padding:2px 0 6px">نسخة 8: حماية البيانات + نسخ احتياطية تلقائية + فحص الجودة + إصلاحات الشبكة والفرجار (14-11-2026)</div>
+<div style="text-align:center;font-size:10px;opacity:.55;padding:2px 0 6px">نسخة 9 · تصميم Material · 14-11-2026</div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -529,11 +616,21 @@ function analyze(){
  if($('ghost').value==='hide')D=D.map((r,i)=>r.map((x,j)=>MASK[i][j]?x:null))}
 
 function selT(i){sel=i;showTG();r3()}
+function gridAxes(){const med=a=>{if(!a.length)return null;a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2},rowH=[],colV=[];
+ for(let i=0;i<R;i++){const a=[];for(let j=0;j<C;j++){const x=num($('h'+i+'_'+j));if(x!==null)a.push(x)}rowH[i]=med(a)}
+ for(let j=0;j<C;j++){const a=[];for(let i=0;i<R;i++){const x=num($('v'+i+'_'+j));if(x!==null)a.push(x)}colV[j]=med(a)}return{rowH,colV}}
+function lineStat(vals,hiT){const v=vals.filter(x=>x!==null);if(v.length<3)return{n:v.length,ok:false,pct:0};
+ const med=a=>{a=[...a].sort((p,q)=>p-q);const n=a.length-1;return(a[Math.floor(n/2)]+a[Math.ceil(n/2)])/2},q=[...v].sort((p,r)=>hiT?p-r:r-p).slice(0,Math.ceil(v.length/2)),bg=med(q),mx=Math.max(...vals.map(x=>x===null?0:Math.max(0,hiT?x-bg:bg-x)));
+ return{n:v.length,ok:!!lineProfile(vals,hiT),pct:Math.abs(bg)>0?mx/Math.abs(bg)*100:0}}
 function noTGmsg(){
  const base='لا يوجد هدف واضح. ';
  if(!isComp()){const v=[];if(D)D.forEach(r=>r.forEach(x=>x!==null&&v.push(x)));
   if(v.length){const mn=Math.min(...v),mx=Math.max(...v),mu=v.reduce((a,b)=>a+b,0)/v.length,pc=(mx-mn)/Math.abs(mu||1)*100;
    if(pc<minAn()*100*2)return base+'الفرق بين أعلى وأدنى قراءة '+pc.toFixed(2)+'% فقط (حد الشذوذ '+(minAn()*100).toFixed(1)+'%) — الأرض متجانسة، وألوان الخريطة مُكبَّرة لإظهار فروق صغيرة جداً.'}
+  if($('amode').value==='lines'){const A=gridAxes(),cur=atypeEff()==='high',st=t=>({h:lineStat(A.rowH,t),v:lineStat(A.colV,t)}),x=st(cur),y=st(!cur),f=z=>(z.ok?'✓ ':'✗ ')+z.pct.toFixed(1)+'%',nm=t=>t?'فراغ هوائي':'ماء/طين/معدن';
+   let m=base+'الأسطر H: '+f(x.h)+' · الأعمدة V: '+f(x.v)+' (النوع الحالي: '+nm(cur)+'، أقل شذوذ '+(minAn()*100).toFixed(1)+'%). الكهف يحتاج شذوذاً في الاتجاهين H وV معاً.';
+   if(y.h.ok&&y.v.ok)m+=' ← النوع الآخر ('+nm(!cur)+') يُظهر شذوذاً في الاتجاهين: غيّر «نوع الشذوذ» من الإعدادات أو اختر «بحث شامل».';
+   return m}
   return base+'جرّب نوع الشذوذ أو العتبة من الإعدادات.'}
  const d=CDIAG,ty=$('atype').selectedOptions[0]?$('atype').selectedOptions[0].textContent:'';
  if(!d.rings.length)return base+'لا توجد قمة ذات دلالة في أي دائرة. جرّب تبديل «نوع الشذوذ» (الحالي: '+ty+')، أو زِد عدد العيّنات.';
@@ -547,8 +644,8 @@ function showTG(){
  const t=TG[sel],f=x=>x.toFixed(1),lowT=atypeEff()==='low',tyTxt=(()=>{const q=tyInfo();return q.w+(q.both?' — يوجد فراغ ومعدن متجاوران في هذا المسح (الظاهر في المجسم هو الأقوى)':(lowT?' — مقاومة أقل من الوسط (قد يكون ماء أو طين أيضاً)':' — مقاومة أعلى من الوسط'))})(),reach=t.reachMax??((num($('ll'))||10)*(num($('al'))||.4));
  el.innerHTML=`<div class="row" style="justify-content:flex-start;margin-bottom:5px">${TG.map((_,i)=>`<button class="chip${i===sel?' on':''}" onclick="selT(${i})">هدف ${i+1}</button>`).join('')}${t.edge?'<span class="w">⚠ يمتد خارج المسح</span>':''}${t.small?'<span class="w">⚠ قريب من دقة المسح</span>':''}${t.floor>reach?`<span class="w">⚠ القاع أعمق من مدى الاستقصاء (~${f(reach)} م)</span>`:''}${t.amb?'<span class="w">⚠ تقاطعات وهمية محتملة</span>':''}${(t.notes||[]).map(n=>`<span class="w">⚠ ${n}</span>`).join('')}${(t.zx&&t.zy&&Math.max(t.zx,t.zy)/Math.max(1e-6,Math.min(t.zx,t.zy))>1.6)?'<span class="w">⚠ تباين بين عمق H وV</span>':''}</div>
  <p class="hint" style="margin:2px 0 6px;text-align:start">النوع المحتمل: ${tyTxt}</p>
- <div class="g3"><div class="kv k"><span>عمق السقف</span><b>${f(t.roof)} ± ${f(t.eR)} م</b></div><div class="kv k"><span>عمق القاع</span><b>${f(t.floor)} ± ${f(t.eF)} م</b></div><div class="kv"><span>الارتفاع</span><b>${f(t.H)} م</b></div>
- <div class="kv"><span>الطول × العرض</span><b>${f(t.L)} × ${f(t.W)} م</b></div><div class="kv"><span>الحجم التقريبي</span><b>${t.vol.toFixed(0)} م³</b></div>${t.compass?`<div class="kv"><span>الاتجاه · المسافة</span><b>${t.bear.toFixed(0)}° · ${f(t.dist)}±${f(t.dd)} م</b></div>`:`<div class="kv"><span>الموقع</span><b>س${f(t.cy+1)} · ع${f(t.cx+1)}</b></div>`}</div>`}
+ <div class="g3"><div class="kv k"><span>عمق السقف</span><b>${f(t.roof)} م (±${f(t.eR)})</b></div><div class="kv k"><span>عمق القاع</span><b>${f(t.floor)} م (±${f(t.eF)})</b></div><div class="kv"><span>الارتفاع</span><b>${f(t.H)} م</b></div>
+ <div class="kv"><span>الطول × العرض</span><b>${f(t.L)} × ${f(t.W)} م</b></div><div class="kv"><span>الحجم التقريبي</span><b>${t.vol.toFixed(0)} م³</b></div>${t.compass?`<div class="kv"><span>الاتجاه · المسافة</span><b>${t.bear.toFixed(0)}° · ${f(t.dist)} م (±${f(t.dd)})</b></div>`:`<div class="kv"><span>الموقع</span><b>س${f(t.cy+1)} · ع${f(t.cx+1)}</b></div>`}</div>`}
 
 /* ---------- المجسم ثلاثي الأبعاد ---------- */
 const BODY=()=>atypeEff()==='low'?{r:[96,165,250],f:[37,99,176]}:{r:[255,159,67],f:[196,104,48]};
@@ -603,7 +700,7 @@ function r3(){
  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(F[0],F[1]);ctx.stroke();ctx.setLineDash([]);
  [A,B,F].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],3.5*dp,0,7);ctx.fill()});
  ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';
- ctx.fillText('السقف '+t.roof.toFixed(1)+' ± '+t.eR.toFixed(1)+' م',B[0]+8*dp,B[1]+4*dp);ctx.fillText('القاع '+t.floor.toFixed(1)+' ± '+t.eF.toFixed(1)+' م',F[0]+8*dp,F[1]+4*dp);ctx.restore();dims3(ctx,pr,t,dp,Wm,X,Y)}
+ ctx.fillText('السقف '+t.roof.toFixed(1)+' م (±'+t.eR.toFixed(1)+')',B[0]+8*dp,B[1]+4*dp);ctx.fillText('القاع '+t.floor.toFixed(1)+' م (±'+t.eF.toFixed(1)+')',F[0]+8*dp,F[1]+4*dp);ctx.restore();dims3(ctx,pr,t,dp,Wm,X,Y)}
 /* أبعاد الكهف المتوقَّع فوق المجسم: العرض والارتفاع وحدود الخطأ والمسافة من محور الفرجار */
 function dims3(ctx,pr,t,dp,Wm,X,Y){
  const f1=v=>v.toFixed(1),ra=Math.max(.3,t.W/2),zc=t.zc??(t.roof+t.floor)/2,fs=11.5*dp*TS3(),Y1='#ffd23f',CY='#7fe3ff';
@@ -619,11 +716,11 @@ function dims3(ctx,pr,t,dp,Wm,X,Y){
  [[t.roof,t.eR],[t.floor,t.eF]].forEach(([z,e])=>{const a=pr(X,Y,-(z-e)),b=pr(X,Y,-(z+e));seg(a,b,CY,4)});
  /* المسافة والاتجاه من محور الفرجار على سطح الأرض */
  if(t.compass){const c0=pr(Wm/2,Wm/2,0),s1=pr(X,Y,0);seg(c0,s1,'#6ee7a0',2,[6,4]);tick(c0,'#6ee7a0');
-  pillTxt(ctx,'المسافة '+f1(t.dist)+(t.dd!=null?' ± '+f1(t.dd):'')+' م · الاتجاه '+t.bear.toFixed(0)+' درجة',(c0[0]+s1[0])/2,(c0[1]+s1[1])/2-8*dp,fs,'#6ee7a0')}
+  pillTxt(ctx,'المسافة '+f1(t.dist)+' م'+(t.dd!=null?' (±'+f1(t.dd)+')':'')+' · الاتجاه '+t.bear.toFixed(0)+' درجة',(c0[0]+s1[0])/2,(c0[1]+s1[1])/2-8*dp,fs,'#6ee7a0')}
  /* ملخص الأبعاد */
  pillTxt(ctx,'العرض '+f1(t.W)+' × الارتفاع '+f1(t.H)+' م · الحجم ≈ '+t.vol.toFixed(0)+' م³',8*dp,ctx.canvas.height-10*dp,fs,'#fff','left')}
 function loop(){cancelAnimationFrame(raf);if(tab===2&&$('ar').checked){cam.yaw+=.008;r3();raf=requestAnimationFrame(loop)}}
-function applyTS(){$('p2').style.setProperty('--ts',($('ts').value/100).toFixed(2))}
+function applyTS(){const v=$('ts').value/100;$('p2').style.setProperty('--ts',v.toFixed(2));$('p2').style.setProperty('--tz',Math.max(.75,v).toFixed(2))}
 function setTS(){applyTS();try{localStorage.setItem('cave-ts',$('ts').value)}catch(e){}r3()}
 function reset3(){cam={yaw:.5,p:.55,z:3};r3()}
 (()=>{const c=$('c3'),P=new Map();
@@ -689,7 +786,7 @@ let ASK=null;
 /* تأكيد بنقرتين داخل الصفحة: النقرة الأولى تعرض الرسالة، والثانية خلال 6 ثوانٍ تنفّذ */
 function ask2(key,msg){
  if(ASK&&ASK.key===key&&Date.now()-ASK.t<6000){ASK=null;askReset();return true}
- ASK={key,t:Date.now()};const h=$('cHint');h.style.display='';h.textContent='⚠ '+msg+' — اضغط الزر مرة أخرى للتأكيد';h.style.color='#ffb020';document.querySelectorAll('#cHead button').forEach(b=>{if(b.textContent.trim()==='تطبيق'&&key==='apply'){b.dataset.t=b.textContent;b.textContent='اضغط للتأكيد';b.style.background='#ffb020';b.style.color='#000'}});
+ ASK={key,t:Date.now()};const h=$('cHint');h.style.display='';h.classList.remove('cl');h.textContent='⚠ '+msg+' — اضغط الزر مرة أخرى للتأكيد';h.style.color='#ffb020';document.querySelectorAll('#cHead button').forEach(b=>{if(b.textContent.trim()==='تطبيق'&&key==='apply'){b.dataset.t=b.textContent;b.textContent='اضغط للتأكيد';b.style.background='#ffb020';b.style.color='#000'}});
  setTimeout(()=>{if(ASK&&ASK.key===key){ASK=null;cHintUpdate();askReset()}},6000);return false}
 function askReset(){document.querySelectorAll('#cHead button').forEach(b=>{if(b.dataset.t){b.textContent=b.dataset.t;delete b.dataset.t;b.style.background='';b.style.color=''}})}
 function applyC(){
@@ -702,7 +799,7 @@ function clearC(){
  if(hasAnyC()&&!ask2('clear','سيتم مسح قراءات الفرجار'))return;
  document.querySelectorAll('#cin input').forEach(e=>e.value='');resetRxState();changed()}
 function cHintUpdate(){
- $('cHint').style.color='';const d=cdims(),g=GTG&&GTG[0];try{$('cas').value=Math.max(...d.rad.map((r,i)=>2*Math.PI*r/d.cn[i])).toFixed(1)}catch(e){}
+ updCSum();$('cHint').style.color='';$('cHint').classList.add('cl');const d=cdims(),g=GTG&&GTG[0];try{$('cas').value=Math.max(...d.rad.map((r,i)=>2*Math.PI*r/d.cn[i])).toFixed(1)}catch(e){}
  $('cHint').textContent='الدوائر: '+d.rad.map(r=>r.toFixed(1)).join('، ')+' م · العيّنات: '+d.cn.join('، ')+' · المسافة بين العيّنات على المحيط: '+d.rad.map((r,i)=>(2*Math.PI*r/d.cn[i]).toFixed(1)).join('، ')+' م'+($('csub')&&$('csub').checked&&d.rad.length>1?' · الصافي = قراءة المدار − قراءة المدار الأول بنفس الاتجاه':'')+(g?' · هدف الشبكة 1 عند س'+(g.cy+1).toFixed(1)+' · ع'+(g.cx+1).toFixed(1)+' — ضع مركز الفرجار هناك':'')}
 function setSM(m){
  if(m!=='grid'&&m!=='compass')m='grid';
@@ -946,7 +1043,7 @@ function reportText(){
  L.push('نوع الشذوذ: '+({high:'فراغ هوائي',low:'معدن/ماء/طين',all:'بحث شامل'}[s.settings.atype]||'')+' ، القيمة: '+({m:'المحصلة',x:'تقاطع H×V',h:'H',v:'V'}[s.settings.metric]||s.settings.metric)+(s.settings.arr!=='raw'?' ، الأقطاب: '+$('arr').selectedOptions?.[0]?.text:''));
  L.push('معايرة: k='+s.settings.kd+' ، ارتفاع/عرض='+s.settings.hr+' ، عدم اليقين='+s.settings.ut+'%'+' ، L='+s.settings.ll+' م ، α='+s.settings.al,'');
  if(!s.result.length)L.push('لا يوجد هدف واضح.');
- s.result.forEach((t,i)=>L.push(`الهدف ${i+1}: ${t.bear!==undefined?'الاتجاه '+f(t.bear)+'° والمسافة '+f(t.dist)+' م':'الموقع س'+f(t.row)+' ع'+f(t.col)} ، الأبعاد ${f(t.L)}×${f(t.W)} م ، الارتفاع ${f(t.H)} م`,`   السقف ${f(t.roof)} ± ${f(t.eR)} م ، القاع ${f(t.floor)} ± ${f(t.eF)} م ، الحجم ≈ ${t.vol.toFixed(0)} م³${t.edge?' (يمتد خارج المسح)':''}`));
+ s.result.forEach((t,i)=>L.push(`الهدف ${i+1}: ${t.bear!==undefined?'الاتجاه '+f(t.bear)+'° والمسافة '+f(t.dist)+' م':'الموقع س'+f(t.row)+' ع'+f(t.col)} ، الأبعاد ${f(t.L)}×${f(t.W)} م ، الارتفاع ${f(t.H)} م`,`   السقف ${f(t.roof)} م (±${f(t.eR)}) ، القاع ${f(t.floor)} م (±${f(t.eF)}) ، الحجم ≈ ${t.vol.toFixed(0)} م³${t.edge?' (يمتد خارج المسح)':''}`));
  if(s.notes)L.push('','ملاحظات: '+s.notes);
  L.push('','* الأعماق تقديرية من قياس بمسافة أقطاب واحدة.');return L.join('\n')}
 function copyReport(){copyText(reportText(),'✓ تم نسخ التقرير.')}
@@ -1369,6 +1466,19 @@ function qcRun(){const el=$('qrep');if(!el)return;const ic={ok:'✅',info:'ℹ�
 function fullReset(){if(!confirm('مسح كل قراءات النمط الحالي وإعادة المؤشر في الجهاز إلى البداية؟ (تُحفظ نسخة احتياطية تلقائياً)'))return;
  devSilent(()=>{if(isComp()){ASK={key:'clear',t:Date.now()};clearC()}else clearAll()});resetRxState();
  if(isConnected())sendCmd('RESET');else status('✓ مُسحت القراءات')}
+
+/* ===== نسخة 9: تفاعلات Material ===== */
+function updCSum(){const t=$('cSumS');if(!t)return;try{const d=cdims();t.textContent=d.rad.length+' دوائر · '+d.cn.join('/')+' عيّنة · نق₀ '+d.rad[0].toFixed(1)+' م'+((($('csub')||{}).checked&&d.rad.length>1)?' · طرح المدار الأول':'')}catch(e){}}
+function toggleCSet(force){const b=$('cSetBody');if(!b)return;const open=force!==undefined?force:b.classList.contains('hide');b.classList.toggle('hide',!open);const c=$('cChev');if(c)c.textContent=open?'⌃':'⌄';try{localStorage.setItem('cave-cset',open?'1':'0')}catch(e){}}
+window.addEventListener('load',()=>{let pref=null;try{pref=localStorage.getItem('cave-cset')}catch(e){}
+ let has=false;try{has=hasAnyC()}catch(e){}const open=pref==='1'||(pref===null&&!has);toggleCSet(open);updCSum();
+ const hint=$('cHint');if(hint)hint.addEventListener('click',()=>hint.classList.toggle('cl'));
+ const hd=$('cHead');if(hd)hd.addEventListener('input',updCSum)});
+/* تموّج اللمس + اهتزاز خفيف في التنقل */
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button');if(!b||b.disabled)return;
+ const r=b.getBoundingClientRect(),s=Math.max(r.width,r.height)*1.6,sp=document.createElement('span');sp.className='ripple';
+ sp.style.cssText='width:'+s+'px;height:'+s+'px;left:'+(e.clientX-r.left-s/2)+'px;top:'+(e.clientY-r.top-s/2)+'px';b.appendChild(sp);setTimeout(()=>sp.remove(),600);
+ if(b.closest('nav')){try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}}},{passive:true});
 </script>
 </body>
 </html>
